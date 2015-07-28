@@ -1,2 +1,2 @@
-# uand-p1
+# Popular Movies
 Udacity Android Nanodegree Project 1
