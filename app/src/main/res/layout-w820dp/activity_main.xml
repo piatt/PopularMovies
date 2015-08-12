@@ -5,15 +5,14 @@
     android:orientation="horizontal">
 
     <fragment
-        android:id="@+id/list_fragment"
-        android:name="com.piatt.udacity.popularmovies.ListFragment"
+        android:tag="@string/list_fragment_tag"
+        android:name="com.piatt.udacity.popularmovies.MovieListFragment"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="match_parent"/>
 
-    <fragment
-        android:id="@+id/detail_fragment"
-        android:name="com.piatt.udacity.popularmovies.DetailFragment"
+    <FrameLayout
+        android:id="@+id/detail_container"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="match_parent"/>
