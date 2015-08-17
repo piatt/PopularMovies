@@ -10,8 +10,8 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center_vertical"
-        android:paddingLeft="@dimen/detail_medium_margin"
-        android:paddingRight="@dimen/detail_medium_margin"
+        android:paddingLeft="@dimen/detail_large_margin"
+        android:paddingRight="@dimen/detail_large_margin"
         android:background="@color/detail_primary"
         android:textSize="@dimen/detail_title"
         android:textColor="?android:textColorPrimary"
@@ -21,9 +21,9 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="3"
-        android:layout_marginTop="@dimen/detail_medium_margin"
-        android:layout_marginLeft="@dimen/detail_medium_margin"
-        android:layout_marginRight="@dimen/detail_medium_margin"
+        android:layout_marginTop="@dimen/detail_large_margin"
+        android:layout_marginLeft="@dimen/detail_large_margin"
+        android:layout_marginRight="@dimen/detail_large_margin"
         android:orientation="horizontal">
 
         <ImageView
@@ -35,20 +35,20 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/detail_medium_margin"
+            android:layout_marginLeft="@dimen/detail_large_margin"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/detail_release_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearanceMedium"/>
+                android:textSize="@dimen/detail_release_date"/>
 
             <TextView
                 android:id="@+id/detail_rating"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearanceSmall"
+                android:textAppearance="?android:textAppearanceMedium"
                 android:textStyle="italic"/>
 
         </LinearLayout>
@@ -58,12 +58,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
-        android:layout_margin="@dimen/detail_medium_margin">
+        android:layout_margin="@dimen/detail_large_margin">
 
         <TextView
             android:id="@+id/detail_synopsis"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textAppearance="?android:textAppearanceSmall"/>
+            android:textAppearance="?android:textAppearanceMedium"/>
     </ScrollView>
 </LinearLayout>

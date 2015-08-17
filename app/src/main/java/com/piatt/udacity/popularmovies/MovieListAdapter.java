@@ -1,16 +1,16 @@
 package com.piatt.udacity.popularmovies;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
-public class MovieListAdapter extends BaseAdapter implements OnClickListener {
+public class MovieListAdapter extends BaseAdapter {
     private static final String LOG_TAG = MovieListAdapter.class.getSimpleName();
 
     private Context context;
@@ -41,27 +41,24 @@ public class MovieListAdapter extends BaseAdapter implements OnClickListener {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView = (ImageView) convertView;
+        ImageView moviePosterView = (ImageView) convertView;
 
-        if (imageView == null) {
-            imageView = new ImageView(context);
-            imageView.setAdjustViewBounds(true);
-            imageView.setOnClickListener(this);
+        if (moviePosterView == null) {
+            moviePosterView = new ImageView(context);
+            moviePosterView.setAdjustViewBounds(true);
         }
 
-        imageView.setTag(getItem(position));
-        MovieListService.getPicasso().load(getItem(position).getPosterUrl()).placeholder(R.drawable.image_placeholder).error(R.drawable.image_error).into(imageView);
+        moviePosterView.setTag(getItem(position));
+        Picasso.with(context).load(getItem(position).getPosterUrl()).into(moviePosterView);
 
-        return imageView;
+        return moviePosterView;
     }
 
-    @Override
-    public void onClick(View view) {
-        ((MovieListActivity) context).viewMovieDetails((MovieDetailItem) view.getTag());
-    }
-
-    public void getDefaultView() {
-        Log.d(LOG_TAG, "Selected default grid item");
-        ((MovieListActivity) context).viewMovieDetails(getItem(0));
+    public void getCurrentView(MovieDetailItem movieDetailItem) {
+        if (movieDetailItem != null) {
+            ((MovieListActivity) context).viewMovieDetails(movieDetailItem);
+        } else {
+            ((MovieListActivity) context).viewMovieDetails(getItem(0));
+        }
     }
 }

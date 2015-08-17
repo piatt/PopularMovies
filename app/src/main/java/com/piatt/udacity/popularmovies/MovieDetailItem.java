@@ -26,7 +26,7 @@ public class MovieDetailItem {
     }
 
     public String getRating() {
-        return rating;
+        return rating.concat("/10");
     }
 
     public String getTitle() {

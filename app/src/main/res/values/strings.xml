@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Popular Movies</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
     <string name="list_fragment_tag">LIST_FRAGMENT</string>
     <string name="detail_fragment_tag">DETAIL_FRAGMENT</string>
 </resources>

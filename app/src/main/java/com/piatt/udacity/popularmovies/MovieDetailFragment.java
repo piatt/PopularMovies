@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -59,7 +61,7 @@ public class MovieDetailFragment extends Fragment {
             ratingView.setText(movieDetailItem.getRating());
             synopsisView.setText(movieDetailItem.getSynopsis());
 
-            MovieListService.getPicasso().load(movieDetailItem.getPosterUrl()).placeholder(R.drawable.image_placeholder).error(R.drawable.image_error).into(posterView);
+            Picasso.with(getActivity()).load(movieDetailItem.getPosterUrl()).into(posterView);
         }
     }
 }

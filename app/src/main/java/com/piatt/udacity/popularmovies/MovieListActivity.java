@@ -32,9 +32,6 @@ public class MovieListActivity extends Activity {
         if (!isDualPane()) {
             Log.d(LOG_TAG, "PHONE - Starting new MovieDetailFragment");
             fragmentManager.beginTransaction().replace(R.id.fragment_container, MovieDetailFragment.newInstance(movieDetailItem), DETAIL_FRAGMENT_TAG).addToBackStack(DETAIL_FRAGMENT_TAG).commit();
-        } else if (isDualPane() && movieDetailFragment == null) {
-            Log.d(LOG_TAG, "TABLET - Starting new MovieDetailFragment");
-            fragmentManager.beginTransaction().replace(R.id.detail_container, MovieDetailFragment.newInstance(movieDetailItem), DETAIL_FRAGMENT_TAG).commit();
         } else if (isDualPane() && movieDetailFragment != null) {
             Log.d(LOG_TAG, "TABLET - Updating existing MovieDetailFragment");
             movieDetailFragment.updateMovieDetailView(movieDetailItem);
@@ -42,6 +39,6 @@ public class MovieListActivity extends Activity {
     }
 
     public boolean isDualPane() {
-        return findViewById(R.id.detail_container) != null;
+        return findViewById(R.id.detail_fragment) != null;
     }
 }
