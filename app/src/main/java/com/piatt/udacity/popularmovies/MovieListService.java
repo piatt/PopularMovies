@@ -19,15 +19,18 @@ import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.OkClient;
+import retrofit.client.Response;
 import retrofit.http.GET;
 
 public abstract class MovieListService {
     private static final String LOG_TAG = MovieListService.class.getSimpleName();
 
     private static Context context;
+    private static GridView gridView;
     private static MovieDataService movieDataService;
     private static ConnectivityManager connectivityManager;
     private static MovieDetailItem currentMovieDetailItem;
+    private static int currentSort;
     private static final String BASE_URL = "http://api.themoviedb.org/3/discover";
     private static final String SORT_POPULARITY = "popularity.desc";
     private static final String SORT_RATING = "vote_average.desc";
@@ -36,7 +39,7 @@ public abstract class MovieListService {
     private static final long CACHE_MAX_AGE = 60 * 60 * 24; // 1 DAY
     private static final long CACHE_MAX_STALE = 60 * 60 * 24 * 7; // 1 WEEK
 
-    private static final RequestInterceptor requestInterceptor = new RequestInterceptor() {
+    private static RequestInterceptor requestInterceptor = new RequestInterceptor() {
         @Override
         public void intercept(RequestFacade request) {
             if (isNetworkAvailable()) {
@@ -44,6 +47,34 @@ public abstract class MovieListService {
             } else {
                 request.addHeader("Cache-Control", String.format("public, only-if-cached, max-stale=%d", CACHE_MAX_STALE));
             }
+        }
+    };
+
+    private static Callback<JsonObject> getMoviesCallback = new Callback<JsonObject>() {
+        @Override
+        public void success(JsonObject jsonObject, Response response) {
+            JsonArray movies = jsonObject.get("results").getAsJsonArray();
+            ArrayList<MovieDetailItem> movieDetailItems = new ArrayList<>();
+            MovieListAdapter adapter = (MovieListAdapter) gridView.getAdapter();
+
+            for (int i = 0; i < movies.size(); i++) {
+                movieDetailItems.add(new MovieDetailItem(movies.get(i).getAsJsonObject()));
+            }
+
+            adapter.setMovieDetailItems(movieDetailItems);
+            adapter.notifyDataSetChanged();
+
+            if (((MovieListActivity) MovieListService.context).isDualPane()) {
+//                    gridView.requestFocusFromTouch();
+//                    gridView.setSelection(1);
+//                    gridView.performItemClick(adapter.getView(1, null, null), 1, 1);
+                adapter.getCurrentView(currentMovieDetailItem);
+            }
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.e(LOG_TAG, error.getMessage());
         }
     };
 
@@ -68,41 +99,26 @@ public abstract class MovieListService {
         currentMovieDetailItem = movieDetailItem;
     }
 
-    public static void getMovieData(Context context, final GridView gridView) {
+    public static int getCurrentSort() {
+        return currentSort;
+    }
+
+    public static void setCurrentSort(int currentSort) {
+        MovieListService.currentSort = currentSort;
+    }
+
+    public static void getMovieData(Context context, GridView gridView, int sort) {
         if (MovieListService.context == null) {
             init(context);
         }
 
-        Log.d(LOG_TAG, "Starting data download...");
-        movieDataService.getMoviesByPopularity(new Callback<JsonObject>() {
-            @Override
-            public void success(JsonObject jsonObject, retrofit.client.Response response) {
-                JsonArray movies = jsonObject.get("results").getAsJsonArray();
-                ArrayList<MovieDetailItem> movieDetailItems = new ArrayList<>();
-                MovieListAdapter adapter = (MovieListAdapter) gridView.getAdapter();
+        MovieListService.gridView = gridView;
 
-                for (int i = 0; i < movies.size(); i++) {
-                    movieDetailItems.add(new MovieDetailItem(movies.get(i).getAsJsonObject()));
-                }
-
-                Log.d(LOG_TAG, "Finished data download");
-                adapter.setMovieDetailItems(movieDetailItems);
-                adapter.notifyDataSetChanged();
-                Log.d(LOG_TAG, "Notified adapter with data");
-
-                if (((MovieListActivity) MovieListService.context).isDualPane()) {
-//                    gridView.requestFocusFromTouch();
-//                    gridView.setSelection(1);
-//                    gridView.performItemClick(adapter.getView(1, null, null), 1, 1);
-                    adapter.getCurrentView(currentMovieDetailItem);
-                }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                Log.e(LOG_TAG, error.getMessage());
-            }
-        });
+        if (sort == 0) {
+            movieDataService.getMoviesByPopularity(getMoviesCallback);
+        } else {
+            movieDataService.getMoviesByRating(getMoviesCallback);
+        }
     }
 
     private static boolean isNetworkAvailable() {
@@ -112,9 +128,9 @@ public abstract class MovieListService {
 
     private interface MovieDataService {
         @GET("/movie?sort_by=" + SORT_POPULARITY + "&api_key=" + API_KEY)
-        void getMoviesByPopularity(Callback<JsonObject> cb);
+        void getMoviesByPopularity(Callback<JsonObject> callback);
 
         @GET("/movie?sort_by=" + SORT_RATING + "&api_key=" + API_KEY)
-        void getMoviesByRating(Callback<JsonObject> cb);
+        void getMoviesByRating(Callback<JsonObject> callback);
     }
 }
