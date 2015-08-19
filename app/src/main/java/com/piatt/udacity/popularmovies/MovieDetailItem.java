@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 public class MovieDetailItem {
     private static final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/w185";
 
+
     private int id;
     private JsonElement title;
     private JsonElement releaseDate;
@@ -46,6 +47,6 @@ public class MovieDetailItem {
     }
 
     public String getPosterUrl() {
-        return posterUrl instanceof JsonNull ? "" : POSTER_BASE_URL.concat(posterUrl.getAsString());
+        return posterUrl instanceof JsonNull ? POSTER_BASE_URL : POSTER_BASE_URL.concat(posterUrl.getAsString());
     }
 }
