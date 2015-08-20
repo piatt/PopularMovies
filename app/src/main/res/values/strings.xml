@@ -13,7 +13,7 @@
     <string name="api_sort_popularity">popularity.desc</string>
     <string name="api_sort_rating">vote_average.desc</string>
     <string name="api_key_filter">api_key</string>
-    <string name="api_key">f0d27daafdedd38c2396470e6656e862</string>
+    <string name="api_key"></string>
     <string name="api_results_filter">results</string>
     <string name="cache_dir">http</string>
     <string name="cache_header">Cache-Control</string>
