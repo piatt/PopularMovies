@@ -5,23 +5,22 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 public class MovieDetailItem {
-    private static final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/w185";
-
-
     private int id;
     private JsonElement title;
     private JsonElement releaseDate;
     private JsonElement rating;
     private JsonElement synopsis;
     private JsonElement posterUrl;
+    private String posterBaseUrl;
 
     public MovieDetailItem(JsonObject movie) {
-        id = movie.get("id").getAsInt();
-        title = movie.get("title");
-        releaseDate = movie.get("release_date");
-        rating = movie.get("vote_average");
-        synopsis = movie.get("overview");
-        posterUrl = movie.get("poster_path");
+        id = movie.get(MovieListService.DETAIL_ID).getAsInt();
+        title = movie.get(MovieListService.DETAIL_TITLE);
+        releaseDate = movie.get(MovieListService.DETAIL_RELEASE_DATE);
+        rating = movie.get(MovieListService.DETAIL_RATING);
+        synopsis = movie.get(MovieListService.DETAIL_SYNOPSIS);
+        posterUrl = movie.get(MovieListService.DETAIL_POSTER_URL);
+        posterBaseUrl = MovieListService.DETAIL_POSTER_BASE_URL;
     }
 
     public int getId() {
@@ -47,6 +46,6 @@ public class MovieDetailItem {
     }
 
     public String getPosterUrl() {
-        return posterUrl instanceof JsonNull ? POSTER_BASE_URL : POSTER_BASE_URL.concat(posterUrl.getAsString());
+        return posterUrl instanceof JsonNull ? posterBaseUrl : posterBaseUrl.concat(posterUrl.getAsString());
     }
 }

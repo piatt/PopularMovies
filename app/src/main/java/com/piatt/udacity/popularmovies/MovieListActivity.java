@@ -3,7 +3,6 @@ package com.piatt.udacity.popularmovies;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.util.Log;
 
 public class MovieListActivity extends Activity {
     private static final String LOG_TAG = MovieListActivity.class.getSimpleName();
@@ -19,6 +18,7 @@ public class MovieListActivity extends Activity {
 
         LIST_FRAGMENT_TAG = getString(R.string.list_fragment_tag);
         DETAIL_FRAGMENT_TAG = getString(R.string.detail_fragment_tag);
+
         fragmentManager = getFragmentManager();
 
         if (fragmentManager.findFragmentByTag(LIST_FRAGMENT_TAG) == null) {
@@ -26,14 +26,19 @@ public class MovieListActivity extends Activity {
         }
     }
 
+    /**
+     * Using a single activity, the master/detail flow is attained by checking for the existence of a fragment only available in xml
+     * in a layout specific to tablets. If it does not exist, the new fragment must be started to replace the existing one.
+     * If that layout exists, the fragment is visible and its content can simply be updated.
+     */
     public void viewMovieDetails(MovieDetailItem movieDetailItem) {
         MovieDetailFragment movieDetailFragment = (MovieDetailFragment) fragmentManager.findFragmentByTag(DETAIL_FRAGMENT_TAG);
 
         if (!isDualPane()) {
-            Log.d(LOG_TAG, "PHONE - Starting new MovieDetailFragment");
-            fragmentManager.beginTransaction().replace(R.id.fragment_container, MovieDetailFragment.newInstance(movieDetailItem), DETAIL_FRAGMENT_TAG).addToBackStack(DETAIL_FRAGMENT_TAG).commit();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, MovieDetailFragment.newInstance(movieDetailItem), DETAIL_FRAGMENT_TAG)
+                    .addToBackStack(DETAIL_FRAGMENT_TAG).commit();
         } else if (isDualPane() && movieDetailFragment != null) {
-            Log.d(LOG_TAG, "TABLET - Updating existing MovieDetailFragment");
             movieDetailFragment.updateMovieDetailView(movieDetailItem);
         }
     }

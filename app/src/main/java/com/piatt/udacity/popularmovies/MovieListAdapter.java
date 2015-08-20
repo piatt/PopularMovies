@@ -54,11 +54,11 @@ public class MovieListAdapter extends BaseAdapter {
         return moviePosterView;
     }
 
-    public void getCurrentView(MovieDetailItem movieDetailItem) {
-        if (movieDetailItem != null) {
-            ((MovieListActivity) context).viewMovieDetails(movieDetailItem);
-        } else {
-            ((MovieListActivity) context).viewMovieDetails(getItem(0));
-        }
+    /**
+     * Called by the MovieListService while in a master/detail flow, this method acts as a programmatic click of an adapter item.
+     * This is done to make sure that the detail view displays content either on first launch or on rotation.
+     */
+    public void getCurrentView(int itemPosition) {
+        ((MovieListActivity) context).viewMovieDetails(getItem(itemPosition));
     }
 }
