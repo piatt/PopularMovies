@@ -14,6 +14,9 @@ public class MovieListActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        MovieListService.init(this);
+
         setContentView(R.layout.activity_main);
 
         LIST_FRAGMENT_TAG = getString(R.string.list_fragment_tag);
@@ -31,19 +34,15 @@ public class MovieListActivity extends Activity {
      * in a layout specific to tablets. If it does not exist, the new fragment must be started to replace the existing one.
      * If that layout exists, the fragment is visible and its content can simply be updated.
      */
-    public void viewMovieDetails(MovieDetailItem movieDetailItem) {
+    public void viewMovieDetails(int movieId) {
         MovieDetailFragment movieDetailFragment = (MovieDetailFragment) fragmentManager.findFragmentByTag(DETAIL_FRAGMENT_TAG);
 
-        if (!isDualPane()) {
+        if (!MovieListService.isDualPane()) {
             fragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, MovieDetailFragment.newInstance(movieDetailItem), DETAIL_FRAGMENT_TAG)
+                    .replace(R.id.fragment_container, MovieDetailFragment.newInstance(movieId), DETAIL_FRAGMENT_TAG)
                     .addToBackStack(DETAIL_FRAGMENT_TAG).commit();
-        } else if (isDualPane() && movieDetailFragment != null) {
-            movieDetailFragment.updateMovieDetailView(movieDetailItem);
+        } else if (MovieListService.isDualPane() && movieDetailFragment != null) {
+            movieDetailFragment.updateMovieDetailView(movieId);
         }
-    }
-
-    public boolean isDualPane() {
-        return findViewById(R.id.detail_fragment) != null;
     }
 }

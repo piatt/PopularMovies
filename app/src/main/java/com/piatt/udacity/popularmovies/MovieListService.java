@@ -5,22 +5,25 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
-import android.widget.GridView;
+import android.widget.Toast;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.squareup.okhttp.Cache;
+import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import retrofit.Callback;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
-import retrofit.RetrofitError;
 import retrofit.client.OkClient;
-import retrofit.client.Response;
 import retrofit.http.GET;
 import retrofit.http.Path;
 
@@ -28,19 +31,19 @@ public abstract class MovieListService {
     private static final String LOG_TAG = MovieListService.class.getSimpleName();
 
     private static Context appContext;
-    private static GridView gridView;
-    private static MovieDataService movieDataService;
     private static ConnectivityManager connectivityManager;
     private static SharedPreferences preferences;
-    private static String API_URL;
+    public static MovieDataService movieDataService;
+    private static boolean prefetched;
     private static String API_BASE_URL;
-    private static String API_ENDPOINT;
-    private static String API_SORT_FILTER;
-    private static String API_SORT_POPULARITY;
-    private static String API_SORT_RATING;
+    private static String API_POPULARITY_ENDPOINT;
+    private static String API_RATING_ENDPOINT;
+    public static String API_FAVORITES_ENDPOINT;
+    public static String API_REVIEWS_ENDPOINT;
+    public static String API_VIDEOS_ENDPOINT;
     private static String API_KEY_FILTER;
     private static String API_KEY;
-    private static String API_RESULTS_FILTER;
+    public static String API_RESULTS_FILTER;
     private static String CACHE_DIR;
     private static String CACHE_HEADER;
     private static String CACHE_HEADER_ONLINE;
@@ -48,12 +51,18 @@ public abstract class MovieListService {
     private static final long CACHE_SIZE = 10 * 1024 * 1024; // 10 MB
     private static final long CACHE_MAX_AGE = 60 * 60 * 24; // 1 DAY
     private static final long CACHE_MAX_STALE = 60 * 60 * 24 * 7; // 1 WEEK
+    private static final int REQUEST_RETRY_MAX = 3;
+    private static final int REQUEST_RETRY_DELAY = 10000; // 10 SECONDS
     private static String PREFERENCES_TAG;
     private static String PREFERENCES_SORT_FILTER;
     private static String PREFERENCES_ITEM_POSITION;
+    private static String PREFERENCES_FAVORITES;
+    public static String ERROR_MESSAGE;
+    public static String ERROR_NETWORK;
     public static String DETAIL_ID;
     public static String DETAIL_TITLE;
     public static String DETAIL_RELEASE_DATE;
+    public static String DETAIL_RUNTIME;
     public static String DETAIL_RATING;
     public static String DETAIL_SYNOPSIS;
     public static String DETAIL_POSTER_URL;
@@ -62,6 +71,7 @@ public abstract class MovieListService {
     /**
      * This interceptor checks network status and applies a different cache control header respectively.
      * This enables subsequent calls to the network for data to be served up from cache if available, even offline.
+     * Additionally, it adds the API key to each request to properly authenticate it.
      */
     private static RequestInterceptor requestInterceptor = new RequestInterceptor() {
         @Override
@@ -71,131 +81,190 @@ public abstract class MovieListService {
             } else {
                 request.addHeader(CACHE_HEADER, String.format(CACHE_HEADER_OFFLINE, CACHE_MAX_STALE));
             }
+            request.addQueryParam(API_KEY_FILTER, API_KEY);
         }
     };
 
     /**
-     * Upon receipt of data, either from the network or cache,
-     * this callback method parses and sends the movie objects to the MovieListAdapter.
+     * This interceptor retries requests if the response returns a particular set of status codes.
+     * This is done to make sure prefetching can still be done successfully in batches while in the background,
+     * making the user experience smoother as they browse quickly between detail items.
      */
-    private static Callback<JsonObject> getMoviesCallback = new Callback<JsonObject>() {
+    private static Interceptor responseInterceptor = new Interceptor() {
         @Override
-        public void success(JsonObject jsonObject, Response response) {
-            JsonArray movies = jsonObject.get(API_RESULTS_FILTER).getAsJsonArray();
-            ArrayList<MovieDetailItem> movieDetailItems = new ArrayList<>();
-            MovieListAdapter adapter = (MovieListAdapter) gridView.getAdapter();
+        public Response intercept(Chain chain) throws IOException {
+            Request request = chain.request();
+            Response response = chain.proceed(request);
 
-            for (int i = 0; i < movies.size(); i++) {
-                movieDetailItems.add(new MovieDetailItem(movies.get(i).getAsJsonObject()));
+            int retries = 0;
+            while (!response.isSuccessful() && retries < REQUEST_RETRY_MAX) {
+                retries++;
+
+                Log.d(LOG_TAG, String.format("Retrying %s", request.urlString()));
+
+                try {
+                    Thread.sleep(REQUEST_RETRY_DELAY);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                response = chain.proceed(request);
             }
 
-            adapter.setMovieDetailItems(movieDetailItems);
-            adapter.notifyDataSetChanged();
+            String location = response.cacheResponse() == null ? "NETWORK" : "CACHE";
+            Log.d(LOG_TAG, String.format("Loaded %s from %s", request.urlString(), location));
 
-            if (((MovieListActivity) appContext).isDualPane()) {
-                gridView.requestFocusFromTouch();
-                gridView.setSelection(getCurrentMovieDetailItem());
-                gridView.performItemClick(adapter.getView(getCurrentMovieDetailItem(), null, null), getCurrentMovieDetailItem(), getCurrentMovieDetailItem());
-                adapter.getCurrentView(getCurrentMovieDetailItem());
-            }
-        }
-
-        @Override
-        public void failure(RetrofitError error) {
-            Log.e(LOG_TAG, error.getMessage());
+            return response;
         }
     };
 
     /**
-     * Called from within the getMovieData method on first launch, this method initializes resources
+     * Called from the MovieListActivity on first launch, this method initializes resources
      * which will be available to the activity and it's fragments outside of the activity's lifecycle.
      */
     public static void init(Context context) {
-        API_URL = context.getString(R.string.api_url);
-        API_BASE_URL = context.getString(R.string.api_base_url);
-        API_ENDPOINT = context.getString(R.string.api_endpoint);
-        API_SORT_FILTER = context.getString(R.string.api_sort_filter);
-        API_SORT_POPULARITY = context.getString(R.string.api_sort_popularity);
-        API_SORT_RATING = context.getString(R.string.api_sort_rating);
-        API_KEY_FILTER = context.getString(R.string.api_key_filter);
-        API_KEY = context.getString(R.string.api_key);
-        API_RESULTS_FILTER = context.getString(R.string.api_results_filter);
-        CACHE_DIR = context.getString(R.string.cache_dir);
-        CACHE_HEADER = context.getString(R.string.cache_header);
-        CACHE_HEADER_ONLINE = context.getString(R.string.cache_header_online);
-        CACHE_HEADER_OFFLINE = context.getString(R.string.cache_header_offline);
-        PREFERENCES_TAG = context.getString(R.string.preferences_tag);
-        PREFERENCES_SORT_FILTER = context.getString(R.string.preferences_sort_filter);
-        PREFERENCES_ITEM_POSITION = context.getString(R.string.preferences_item_position);
-        DETAIL_ID = context.getString(R.string.detail_id);
-        DETAIL_TITLE = context.getString(R.string.detail_title);
-        DETAIL_RELEASE_DATE = context.getString(R.string.detail_release_date);
-        DETAIL_RATING = context.getString(R.string.detail_rating);
-        DETAIL_SYNOPSIS = context.getString(R.string.detail_synopsis);
-        DETAIL_POSTER_URL = context.getString(R.string.detail_poster_url);
-        DETAIL_POSTER_BASE_URL = context.getString(R.string.detail_poster_base_url);
+        if (appContext == null) {
+            Log.d(LOG_TAG, "Initializing resources");
 
-        Cache cache = new Cache(new File(context.getCacheDir(), CACHE_DIR), CACHE_SIZE);
-        OkHttpClient okHttpClient = new OkHttpClient();
-        okHttpClient.setCache(cache);
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(API_BASE_URL)
-                .setClient(new OkClient(okHttpClient))
-                .setRequestInterceptor(requestInterceptor)
-                .setLogLevel(RestAdapter.LogLevel.BASIC)
-                .build();
+            API_BASE_URL = context.getString(R.string.api_base_url);
+            API_POPULARITY_ENDPOINT = context.getString(R.string.api_popularity_endpoint);
+            API_RATING_ENDPOINT = context.getString(R.string.api_rating_endpoint);
+            API_FAVORITES_ENDPOINT = context.getString(R.string.api_favorites_endpoint);
+            API_REVIEWS_ENDPOINT = context.getString(R.string.api_reviews_endpoint);
+            API_VIDEOS_ENDPOINT = context.getString(R.string.api_videos_endpoint);
+            API_KEY_FILTER = context.getString(R.string.api_key_filter);
+            API_KEY = context.getString(R.string.api_key);
+            API_RESULTS_FILTER = context.getString(R.string.api_results_filter);
+            CACHE_DIR = context.getString(R.string.cache_dir);
+            CACHE_HEADER = context.getString(R.string.cache_header);
+            CACHE_HEADER_ONLINE = context.getString(R.string.cache_header_online);
+            CACHE_HEADER_OFFLINE = context.getString(R.string.cache_header_offline);
+            PREFERENCES_TAG = context.getString(R.string.preferences_tag);
+            PREFERENCES_SORT_FILTER = context.getString(R.string.preferences_sort_filter);
+            PREFERENCES_ITEM_POSITION = context.getString(R.string.preferences_item_position);
+            PREFERENCES_FAVORITES = context.getString(R.string.preferences_favorites);
+            ERROR_MESSAGE = context.getString(R.string.error_message);
+            ERROR_NETWORK = context.getString(R.string.error_network);
+            DETAIL_ID = context.getString(R.string.detail_id);
+            DETAIL_TITLE = context.getString(R.string.detail_title);
+            DETAIL_RELEASE_DATE = context.getString(R.string.detail_release_date);
+            DETAIL_RUNTIME = context.getString(R.string.detail_runtime);
+            DETAIL_RATING = context.getString(R.string.detail_rating);
+            DETAIL_SYNOPSIS = context.getString(R.string.detail_synopsis);
+            DETAIL_POSTER_URL = context.getString(R.string.detail_poster_url);
+            DETAIL_POSTER_BASE_URL = context.getString(R.string.detail_poster_base_url);
 
-        appContext = context;
-        movieDataService = restAdapter.create(MovieDataService.class);
-        connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        preferences = context.getSharedPreferences(PREFERENCES_TAG, Context.MODE_PRIVATE);
+            Cache cache = new Cache(new File(context.getCacheDir(), CACHE_DIR), CACHE_SIZE);
+            OkHttpClient okHttpClient = new OkHttpClient();
+            okHttpClient.setCache(cache);
+            okHttpClient.interceptors().add(responseInterceptor);
+            RestAdapter restAdapter = new RestAdapter.Builder()
+                    .setEndpoint(API_BASE_URL)
+                    .setClient(new OkClient(okHttpClient))
+                    .setRequestInterceptor(requestInterceptor)
+                    .build();
+
+            appContext = context;
+            connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            preferences = context.getSharedPreferences(PREFERENCES_TAG, Context.MODE_PRIVATE);
+            movieDataService = restAdapter.create(MovieDataService.class);
+        }
     }
 
-    public static int getCurrentMovieDetailItem() {
+    public static int getCurrentMovieItem() {
         return preferences.getInt(PREFERENCES_ITEM_POSITION, 0);
     }
 
-    public static void setCurrentMovieDetailItem(int itemPosition) {
+    public static void setCurrentMovieItem(int itemPosition) {
         preferences.edit().putInt(PREFERENCES_ITEM_POSITION, itemPosition).commit();
     }
 
-    public static int getCurrentSortFilter() {
-        return preferences.getInt(PREFERENCES_SORT_FILTER, 0);
+    public static String getCurrentSortFilter() {
+        return preferences.getString(PREFERENCES_SORT_FILTER, API_POPULARITY_ENDPOINT);
     }
 
-    public static void setCurrentSortFilter(int sortFilter) {
-        preferences.edit().putInt(PREFERENCES_SORT_FILTER, sortFilter).commit();
-    }
+    public static int getCurrentSortFilterPosition() {
+        String sortFilter = getCurrentSortFilter();
+        int sortFilterPosition = 0;
 
-    /**
-     * Called by the MovieListFragment either on startup on sort filter toggle,
-     * this method calls the appropriate RestAdapter method to request data from either the network or cache.
-     */
-    public static void getMovieData(Context context, GridView gridView) {
-        if (appContext == null) {
-            init(context);
+        if (sortFilter.equals(API_POPULARITY_ENDPOINT)) {
+            sortFilterPosition = 0;
+        } else if (sortFilter.equals(API_RATING_ENDPOINT)) {
+            sortFilterPosition = 1;
+        } else if (sortFilter.equals(API_FAVORITES_ENDPOINT)) {
+            sortFilterPosition = 2;
         }
 
-        MovieListService.gridView = gridView;
-
-        if (getCurrentSortFilter() == 0) {
-            movieDataService.getMovies(getMoviesUrl(API_SORT_POPULARITY), getMoviesCallback);
-        } else {
-            movieDataService.getMovies(getMoviesUrl(API_SORT_RATING), getMoviesCallback);
-        }
+        return sortFilterPosition;
     }
 
-    private static boolean isNetworkAvailable() {
+    public static void setCurrentSortFilter(int sortPosition) {
+        String sortFilter;
+
+        switch (sortPosition) {
+            case 0: sortFilter = API_POPULARITY_ENDPOINT; break;
+            case 1: sortFilter = API_RATING_ENDPOINT; break;
+            case 2: sortFilter = API_FAVORITES_ENDPOINT; break;
+            default: sortFilter = API_POPULARITY_ENDPOINT; break;
+        }
+
+        preferences.edit().putString(PREFERENCES_SORT_FILTER, sortFilter).commit();
+    }
+
+    public static ArrayList<Integer> getCurrentFavorites() {
+        ArrayList<Integer> favorites = new ArrayList<>();
+        Set<String> storedFavorites = preferences.getStringSet(PREFERENCES_FAVORITES, new HashSet<String>());
+        for (String favorite : storedFavorites) {
+            favorites.add(Integer.parseInt(favorite));
+        }
+        return favorites;
+    }
+
+    public static void addFavorite(int favorite) {
+        Set<String> storedFavorites = preferences.getStringSet(PREFERENCES_FAVORITES, new HashSet<String>());
+        storedFavorites.add(String.valueOf(favorite));
+        preferences.edit().putStringSet(PREFERENCES_FAVORITES, storedFavorites);
+    }
+
+    public static void removeFavorite(int favorite) {
+        Set<String> storedFavorites = preferences.getStringSet(PREFERENCES_FAVORITES, new HashSet<String>());
+        storedFavorites.remove(String.valueOf(favorite));
+        preferences.edit().putStringSet(PREFERENCES_FAVORITES, storedFavorites);
+    }
+
+    public static void getFavoritesList() {
+        Toast.makeText(appContext, "FAVORITES", Toast.LENGTH_SHORT).show();
+    }
+
+    public static void getMovieDetails(Context context, int movieId) {
+        ((MovieListActivity) context).viewMovieDetails(movieId);
+    }
+
+    public static boolean isDualPane() {
+        return ((MovieListActivity) appContext).findViewById(R.id.detail_fragment) != null;
+    }
+
+    public static boolean isNetworkAvailable() {
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
-    private static String getMoviesUrl(String sortParam) {
-        return String.format(API_URL, API_ENDPOINT, API_SORT_FILTER, sortParam, API_KEY_FILTER, API_KEY);
+    public static boolean isPrefetched() {
+        return prefetched;
     }
 
-    private interface MovieDataService {
-        @GET("/{url}")
-        void getMovies(@Path(value = "url", encode = false) String url, Callback<JsonObject> callback);
+    public static void setPrefetched(boolean prefetched) {
+        MovieListService.prefetched = prefetched;
+    }
+
+    public interface MovieDataService {
+        @GET("/{endpoint}")
+        void getMovieList(@Path("endpoint") String endpoint, Callback<JsonObject> callback);
+
+        @GET("/{id}")
+        void getMovieDetails(@Path("id") int id, Callback<JsonObject> callback);
+
+        @GET("/{id}/{endpoint}")
+        void getMovieExtras(@Path("id") int id, @Path("endpoint") String endpoint, Callback<JsonObject> callback);
     }
 }

@@ -5,15 +5,18 @@
     <string name="preferences_tag">PREFS</string>
     <string name="preferences_sort_filter">SORT_FILTER</string>
     <string name="preferences_item_position">ITEM_POSITION</string>
+    <string name="preferences_favorites">FAVORITES</string>
     <string name="action_sort">Sort</string>
-    <string name="api_url"><html>%1$s?%2$s=%3$s&amp;%4$s=%5$s</html></string>
-    <string name="api_base_url">http://api.themoviedb.org/3/discover</string>
-    <string name="api_endpoint">movie</string>
-    <string name="api_sort_filter">sort_by</string>
-    <string name="api_sort_popularity">popularity.desc</string>
-    <string name="api_sort_rating">vote_average.desc</string>
+    <string name="error_message">Download error, please retry!</string>
+    <string name="error_network">Network is not connected!</string>
+    <string name="api_base_url">http://api.themoviedb.org/3/movie</string>
+    <string name="api_popularity_endpoint">popular</string>
+    <string name="api_rating_endpoint">top_rated</string>
+    <string name="api_favorites_endpoint">favorites</string>
+    <string name="api_reviews_endpoint">reviews</string>
+    <string name="api_videos_endpoint">videos</string>
     <string name="api_key_filter">api_key</string>
-    <string name="api_key"></string>
+    <string name="api_key">f0d27daafdedd38c2396470e6656e862</string>
     <string name="api_results_filter">results</string>
     <string name="cache_dir">http</string>
     <string name="cache_header">Cache-Control</string>
@@ -22,6 +25,7 @@
     <string name="detail_id">id</string>
     <string name="detail_title">title</string>
     <string name="detail_release_date">release_date</string>
+    <string name="detail_runtime">runtime</string>
     <string name="detail_rating">vote_average</string>
     <string name="detail_synopsis">overview</string>
     <string name="detail_poster_url">poster_path</string>

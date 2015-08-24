@@ -8,6 +8,7 @@ public class MovieDetailItem {
     private int id;
     private JsonElement title;
     private JsonElement releaseDate;
+    private JsonElement runtime;
     private JsonElement rating;
     private JsonElement synopsis;
     private JsonElement posterUrl;
@@ -17,6 +18,7 @@ public class MovieDetailItem {
         id = movie.get(MovieListService.DETAIL_ID).getAsInt();
         title = movie.get(MovieListService.DETAIL_TITLE);
         releaseDate = movie.get(MovieListService.DETAIL_RELEASE_DATE);
+        runtime = movie.get(MovieListService.DETAIL_RUNTIME);
         rating = movie.get(MovieListService.DETAIL_RATING);
         synopsis = movie.get(MovieListService.DETAIL_SYNOPSIS);
         posterUrl = movie.get(MovieListService.DETAIL_POSTER_URL);
@@ -34,6 +36,10 @@ public class MovieDetailItem {
     public String getReleaseDate() {
         String newReleaseDate = releaseDate instanceof JsonNull ? "" : releaseDate.getAsString();
         return newReleaseDate.isEmpty() ? "" : newReleaseDate.substring(0, newReleaseDate.indexOf("-"));
+    }
+
+    public String getRuntime() {
+        return runtime instanceof JsonNull ? "" : runtime.getAsString().concat(" min");
     }
 
     public String getRating() {

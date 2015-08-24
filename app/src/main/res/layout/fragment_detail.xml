@@ -45,6 +45,13 @@
                 android:textAppearance="?android:textAppearanceMedium"/>
 
             <TextView
+                android:id="@+id/detail_runtime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textStyle="italic|bold"/>
+
+            <TextView
                 android:id="@+id/detail_rating"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
