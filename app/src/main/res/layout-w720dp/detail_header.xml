@@ -1,0 +1,56 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/detail_large_margin"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/detail_poster"
+        android:layout_width="@dimen/detail_poster_width"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/detail_large_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/detail_release_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/detail_medium_margin"
+            android:textSize="@dimen/detail_large_text" />
+
+        <TextView
+            android:id="@+id/detail_runtime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/detail_medium_margin"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textStyle="italic|bold" />
+
+        <TextView
+            android:id="@+id/detail_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/detail_medium_margin"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textStyle="italic" />
+
+        <ToggleButton
+            android:id="@+id/detail_favorite_toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/detail_large_margin"
+            android:paddingLeft="@dimen/detail_small_margin"
+            android:paddingRight="@dimen/detail_small_margin"
+            android:background="@drawable/favorites_toggle"
+            android:textColor="?android:textColorPrimary"
+            android:textOff="@string/detail_favorite_off"
+            android:textOn="@string/detail_favorite_on"
+            android:textSize="@dimen/detail_label" />
+
+    </LinearLayout>
+</LinearLayout>

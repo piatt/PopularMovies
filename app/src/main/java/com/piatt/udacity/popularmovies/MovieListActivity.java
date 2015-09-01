@@ -2,6 +2,7 @@ package com.piatt.udacity.popularmovies;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 public class MovieListActivity extends Activity {
@@ -18,6 +19,10 @@ public class MovieListActivity extends Activity {
         MovieListService.init(this);
 
         setContentView(R.layout.activity_main);
+
+        if (!MovieListService.isDualPane()) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
 
         LIST_FRAGMENT_TAG = getString(R.string.list_fragment_tag);
         DETAIL_FRAGMENT_TAG = getString(R.string.detail_fragment_tag);
@@ -44,5 +49,11 @@ public class MovieListActivity extends Activity {
         } else if (MovieListService.isDualPane() && movieDetailFragment != null) {
             movieDetailFragment.updateMovieDetailView(movieId);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        getActionBar().setDisplayHomeAsUpEnabled(false);
+        super.onBackPressed();
     }
 }

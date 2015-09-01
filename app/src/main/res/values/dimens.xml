@@ -2,5 +2,11 @@
     <dimen name="detail_large_margin">32dp</dimen>
     <dimen name="detail_medium_margin">16dp</dimen>
     <dimen name="detail_small_margin">8dp</dimen>
-    <dimen name="detail_title">24sp</dimen>
+    <dimen name="detail_negative_margin">-4dp</dimen>
+    <dimen name="detail_title">20sp</dimen>
+    <dimen name="detail_large_text">22sp</dimen>
+    <dimen name="detail_label">10sp</dimen>
+    <dimen name="detail_divider">1dp</dimen>
+    <dimen name="detail_poster_width">150dp</dimen>
+    <dimen name="detail_videos_indicator">32sp</dimen>
 </resources>

@@ -5,4 +5,6 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:numColumns="3"
+    android:drawSelectorOnTop="true"
+    android:listSelector="@drawable/list_selector"
     android:background="@color/list_primary"/>

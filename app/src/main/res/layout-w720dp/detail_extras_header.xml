@@ -1,0 +1,30 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/detail_extras_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/detail_medium_margin"
+            android:text="@string/detail_reviews_label"
+            android:textColor="@color/detail_primary"
+            android:textSize="@dimen/detail_label"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/detail_extras_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:textColor="@color/detail_primary"/>
+
+        <View
+            android:layout_height="@dimen/detail_divider"
+            android:layout_width="match_parent"
+            android:layout_alignParentBottom="true"
+            android:background="@color/detail_primary" />
+
+</RelativeLayout>

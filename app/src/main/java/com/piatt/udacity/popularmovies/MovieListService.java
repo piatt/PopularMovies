@@ -67,6 +67,17 @@ public abstract class MovieListService {
     public static String DETAIL_SYNOPSIS;
     public static String DETAIL_POSTER_URL;
     public static String DETAIL_POSTER_BASE_URL;
+    public static String DETAIL_REVIEW_CONTENT;
+    public static String DETAIL_REVIEW_AUTHOR;
+    public static String DETAIL_REVIEW_NO_AUTHOR;
+    public static String DETAIL_VIDEO_NAME;
+    public static String DETAIL_VIDEO_URL;
+    public static String DETAIL_VIDEO_BASE_URL;
+    public static String DETAIL_SYNOPSIS_LABEL;
+    public static String DETAIL_REVIEWS_LABEL;
+    public static String DETAIL_VIDEOS_LABEL;
+    public static String DETAIL_CONTRACT_INDICATOR;
+    public static String DETAIL_EXPAND_INDICATOR;
 
     /**
      * This interceptor checks network status and applies a different cache control header respectively.
@@ -153,6 +164,17 @@ public abstract class MovieListService {
             DETAIL_SYNOPSIS = context.getString(R.string.detail_synopsis);
             DETAIL_POSTER_URL = context.getString(R.string.detail_poster_url);
             DETAIL_POSTER_BASE_URL = context.getString(R.string.detail_poster_base_url);
+            DETAIL_REVIEW_CONTENT = context.getString(R.string.detail_review_content);
+            DETAIL_REVIEW_AUTHOR = context.getString(R.string.detail_review_author);
+            DETAIL_REVIEW_NO_AUTHOR = context.getString(R.string.detail_review_no_author);
+            DETAIL_VIDEO_NAME = context.getString(R.string.detail_video_name);
+            DETAIL_VIDEO_URL = context.getString(R.string.detail_video_url);
+            DETAIL_VIDEO_BASE_URL = context.getString(R.string.detail_video_base_url);
+            DETAIL_SYNOPSIS_LABEL = context.getString(R.string.detail_synopsis_label);
+            DETAIL_REVIEWS_LABEL = context.getString(R.string.detail_reviews_label);
+            DETAIL_VIDEOS_LABEL = context.getString(R.string.detail_videos_label);
+            DETAIL_CONTRACT_INDICATOR = context.getString(R.string.detail_contract_indicator);
+            DETAIL_EXPAND_INDICATOR = context.getString(R.string.detail_expand_indicator);
 
             Cache cache = new Cache(new File(context.getCacheDir(), CACHE_DIR), CACHE_SIZE);
             OkHttpClient okHttpClient = new OkHttpClient();
