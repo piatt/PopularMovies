@@ -55,7 +55,7 @@ public class MovieListFragment extends Fragment implements OnItemClickListener, 
             gridView.setAdapter(new MovieListAdapter(getActivity()));
             gridView.setOnItemClickListener(this);
 
-            MovieListService.movieDataService.getMovieList(MovieListService.getCurrentSortFilter(), movieListCallback);
+            getMovieList();
         }
 
         return gridView;
@@ -96,12 +96,7 @@ public class MovieListFragment extends Fragment implements OnItemClickListener, 
         if (view != null && position != MovieListService.getCurrentSortFilterPosition()) {
             MovieListService.setPrefetched(false);
             MovieListService.setCurrentSortFilter(position);
-
-            if (MovieListService.getCurrentSortFilter().equals(MovieListService.API_FAVORITES_ENDPOINT)) {
-                MovieListService.getFavoritesList();
-            } else {
-                MovieListService.movieDataService.getMovieList(MovieListService.getCurrentSortFilter(), movieListCallback);
-            }
+            getMovieList();
         }
     }
 
@@ -138,6 +133,24 @@ public class MovieListFragment extends Fragment implements OnItemClickListener, 
     }
 
     /**
+     * This method determines which list of data to load into the MovieListFragment based on the current sort filter.
+     * This method is invoked either on initial app launch, or orientation change, or on sort filter change.
+     */
+    private void getMovieList() {
+        if (MovieListService.getCurrentSortFilter().equals(MovieListService.API_FAVORITES_ENDPOINT)) {
+            MovieListAdapter movieListAdapter = (MovieListAdapter) gridView.getAdapter();
+            movieListAdapter.notifyDataSetInvalidated();
+            movieListAdapter.setMovieListItems(new ArrayList<MovieListItem>(MovieListService.getCurrentFavorites().size()));
+
+            for (Integer movieId : MovieListService.getCurrentFavorites()) {
+                MovieListService.movieDataService.getMovieDetails(movieId, movieFavoritesCallback);
+            }
+        } else {
+            MovieListService.movieDataService.getMovieList(MovieListService.getCurrentSortFilter(), movieListCallback);
+        }
+    }
+
+    /**
      * Upon receipt of data, either from the network or cache,
      * this callback method parses and sends the MovieListItem objects to the MovieListAdapter.
      * Additionally, prefetching of MovieDetailItems is done in the background to support performance and offline access.
@@ -164,6 +177,25 @@ public class MovieListFragment extends Fragment implements OnItemClickListener, 
         public void failure(RetrofitError error) {
             String message = MovieListService.isNetworkAvailable() ? MovieListService.ERROR_MESSAGE : MovieListService.ERROR_NETWORK;
             Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    /**
+     * Called by the MovieListService in response to a request to update the detail view,
+     * this callback method is invoked upon receipt of data either from the network or cache,
+     * and populates a new MovieDetailItem for use in the MovieDetailFragment.
+     */
+    private Callback<JsonObject> movieFavoritesCallback = new Callback<JsonObject>() {
+        @Override
+        public void success(JsonObject jsonObject, Response response) {
+            MovieListAdapter movieListAdapter = (MovieListAdapter) gridView.getAdapter();
+            movieListAdapter.addMovieListItem(new MovieListItem(jsonObject));
+            movieListAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.d(LOG_TAG, error.getMessage());
         }
     };
 

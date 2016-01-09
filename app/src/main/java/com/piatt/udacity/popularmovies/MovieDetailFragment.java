@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -116,9 +117,11 @@ public class MovieDetailFragment extends Fragment {
             detailViewHolder.releaseDateView.setText(movieDetailItem.getReleaseDate());
             detailViewHolder.runtimeView.setText(movieDetailItem.getRuntime());
             detailViewHolder.ratingView.setText(movieDetailItem.getRating());
+            detailViewHolder.favoriteToggleButton.setChecked(MovieListService.isFavorite(movieId));
 
             Picasso.with(getActivity()).load(movieDetailItem.getPosterUrl()).into(detailViewHolder.posterView);
 
+            movieDetailAdapter.notifyDataSetInvalidated();
             movieDetailAdapter.setSynopsis(movieDetailItem.getSynopsis());
 
             if (!extrasView.isGroupExpanded(0)) {
@@ -191,6 +194,15 @@ public class MovieDetailFragment extends Fragment {
 
         public DetailViewHolder(View view) {
             ButterKnife.bind(this, view);
+        }
+
+        @OnClick(R.id.detail_favorite_toggle)
+        public void onFavoriteToggle(ToggleButton toggleButton) {
+            if (toggleButton.isChecked()) {
+                MovieListService.addFavorite(movieId);
+            } else {
+                MovieListService.removeFavorite(movieId);
+            }
         }
     }
 }

@@ -16,20 +16,31 @@
 #   public *;
 #}
 
-# Start Picasso
--dontwarn com.squareup.okhttp.**
-# End Picasso
+-dontwarn android.support.design.**
+-keep class android.support.design.** { *; }
+-keep interface android.support.design.** { *; }
+-keep public class android.support.design.R$* { *; }
 
-# Start Butterknife
 -keep class butterknife.** { *; }
 -dontwarn butterknife.internal.**
--keep class **$$ViewInjector { *; }
-
+-keep class **$$ViewBinder { *; }
 -keepclasseswithmembernames class * {
     @butterknife.* <fields>;
 }
-
 -keepclasseswithmembernames class * {
     @butterknife.* <methods>;
 }
-# End Butterknife
+
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
+
+-dontwarn com.squareup.okhttp.**
+
+-keepclassmembers class ** {
+    public void onEvent*(***);
+}
+-keepclassmembers class * extends de.greenrobot.event.util.ThrowableFailureEvent {
+    <init>(java.lang.Throwable);
+}

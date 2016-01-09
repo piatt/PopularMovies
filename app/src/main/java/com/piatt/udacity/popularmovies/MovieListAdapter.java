@@ -39,6 +39,10 @@ public class MovieListAdapter extends BaseAdapter {
         this.movieListItems = movieListItems;
     }
 
+    public void addMovieListItem(MovieListItem movieListItem) {
+        movieListItems.add(movieListItem);
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView moviePosterView = (ImageView) convertView;

@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 import com.squareup.okhttp.Cache;
@@ -245,17 +244,17 @@ public abstract class MovieListService {
     public static void addFavorite(int favorite) {
         Set<String> storedFavorites = preferences.getStringSet(PREFERENCES_FAVORITES, new HashSet<String>());
         storedFavorites.add(String.valueOf(favorite));
-        preferences.edit().putStringSet(PREFERENCES_FAVORITES, storedFavorites);
+        preferences.edit().putStringSet(PREFERENCES_FAVORITES, storedFavorites).commit();
     }
 
     public static void removeFavorite(int favorite) {
         Set<String> storedFavorites = preferences.getStringSet(PREFERENCES_FAVORITES, new HashSet<String>());
         storedFavorites.remove(String.valueOf(favorite));
-        preferences.edit().putStringSet(PREFERENCES_FAVORITES, storedFavorites);
+        preferences.edit().putStringSet(PREFERENCES_FAVORITES, storedFavorites).commit();
     }
 
-    public static void getFavoritesList() {
-        Toast.makeText(appContext, "FAVORITES", Toast.LENGTH_SHORT).show();
+    public static boolean isFavorite(int movieId) {
+        return getCurrentFavorites().contains(Integer.valueOf(movieId));
     }
 
     public static void getMovieDetails(Context context, int movieId) {
