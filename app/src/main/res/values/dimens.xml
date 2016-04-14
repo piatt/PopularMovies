@@ -1,4 +1,15 @@
 <resources>
+    <dimen name="toolbar_height">56dp</dimen>
+
+    <dimen name="space_4">4dp</dimen>
+    <dimen name="space_8">8dp</dimen>
+    <dimen name="space_12">12dp</dimen>
+    <dimen name="space_16">16dp</dimen>
+    <dimen name="space_24">24dp</dimen>
+    <dimen name="space_32">32dp</dimen>
+    <dimen name="space_48">48dp</dimen>
+    <dimen name="space_64">64dp</dimen>
+
     <dimen name="detail_large_margin">32dp</dimen>
     <dimen name="detail_medium_margin">16dp</dimen>
     <dimen name="detail_small_margin">8dp</dimen>

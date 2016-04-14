@@ -1,0 +1,7 @@
+<resources>
+    <dimen name="detail_title">30sp</dimen>
+    <dimen name="detail_label">12sp</dimen>
+    <dimen name="detail_divider">1dp</dimen>
+    <dimen name="detail_poster_width">180dp</dimen>
+    <dimen name="detail_videos_indicator">40sp</dimen>
+</resources>

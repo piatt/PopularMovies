@@ -16,6 +16,8 @@
 #   public *;
 #}
 
+-dontwarn java.lang.invoke.*
+
 -dontwarn android.support.design.**
 -keep class android.support.design.** { *; }
 -keep interface android.support.design.** { *; }

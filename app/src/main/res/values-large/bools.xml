@@ -1,0 +1,3 @@
+<resources>
+    <item type="bool" name="large_layout">true</item>
+</resources>
