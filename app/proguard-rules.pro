@@ -40,9 +40,13 @@
 
 -dontwarn com.squareup.okhttp.**
 
+-keepattributes *Annotation*
 -keepclassmembers class ** {
-    public void onEvent*(***);
+    @org.greenrobot.eventbus.Subscribe <methods>;
 }
--keepclassmembers class * extends de.greenrobot.event.util.ThrowableFailureEvent {
+-keep enum org.greenrobot.eventbus.ThreadMode { *; }
+
+# Only required if you use AsyncExecutor
+-keepclassmembers class * extends org.greenrobot.eventbus.util.ThrowableFailureEvent {
     <init>(java.lang.Throwable);
 }

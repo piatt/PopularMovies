@@ -17,10 +17,11 @@ import com.piatt.udacity.popularmovies.R;
 import com.piatt.udacity.popularmovies.adapter.DetailAdapter;
 import com.piatt.udacity.popularmovies.manager.ContextManager;
 
+import org.greenrobot.eventbus.EventBus;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import de.greenrobot.event.EventBus;
 
 public class DetailFragment extends Fragment {
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();

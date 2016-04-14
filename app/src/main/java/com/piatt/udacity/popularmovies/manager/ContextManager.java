@@ -8,7 +8,8 @@ import com.piatt.udacity.popularmovies.R;
 import com.piatt.udacity.popularmovies.event.DetailUpdateEvent;
 import com.piatt.udacity.popularmovies.util.Constants;
 
-import de.greenrobot.event.EventBus;
+import org.greenrobot.eventbus.EventBus;
+
 import lombok.Getter;
 import lombok.Setter;
 

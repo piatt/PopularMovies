@@ -21,12 +21,13 @@ import com.piatt.udacity.popularmovies.model.Movie;
 import com.piatt.udacity.popularmovies.util.Constants;
 import com.squareup.picasso.Picasso;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import de.greenrobot.event.EventBus;
 import retrofit2.Callback;
 import retrofit2.Response;
 
@@ -67,7 +68,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieViewHolder> {
     private Callback<JsonObject> moviesCallback = new Callback<JsonObject>() {
         @Override
         public void onResponse(Response<JsonObject> response) {
-            if (response.isSuccess()) {
+            if (response.isSuccessful()) {
                 movies.clear();
                 movies = ApiManager.getInstance().getGson().fromJson(response.body().get(Constants.API_RESULTS_FILTER), new TypeToken<ArrayList<Movie>>(){}.getType());
                 fetchMovieDetails();

@@ -17,11 +17,12 @@ import com.piatt.udacity.popularmovies.fragment.MoviesFragment;
 import com.piatt.udacity.popularmovies.manager.ContextManager;
 import com.piatt.udacity.popularmovies.util.Constants;
 
+import org.greenrobot.eventbus.EventBus;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemSelected;
-import de.greenrobot.event.EventBus;
 
 public class LaunchActivity extends AppCompatActivity {
     private static final String LOG_TAG = LaunchActivity.class.getSimpleName();
