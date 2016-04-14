@@ -10,6 +10,16 @@
     <dimen name="space_48">48dp</dimen>
     <dimen name="space_64">64dp</dimen>
 
+    <dimen name="size_8">8sp</dimen>
+    <dimen name="size_10">10sp</dimen>
+    <dimen name="size_12">12sp</dimen>
+    <dimen name="size_16">16sp</dimen>
+    <dimen name="size_20">20sp</dimen>
+    <dimen name="size_24">24sp</dimen>
+    <dimen name="size_32">32sp</dimen>
+    <dimen name="size_48">48sp</dimen>
+    <dimen name="size_64">64sp</dimen>
+
     <dimen name="detail_large_margin">32dp</dimen>
     <dimen name="detail_medium_margin">16dp</dimen>
     <dimen name="detail_small_margin">8dp</dimen>

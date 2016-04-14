@@ -4,4 +4,21 @@
         <item name="colorPrimary">@color/blue</item>
         <item name="colorPrimaryDark">@color/dark_blue</item>
     </style>
+
+    <style name="Text.Light" parent="android:TextAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+    <style name="Text.Medium" parent="android:TextAppearance">
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    <style name="Text.Regular" parent="android:TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+    <style name="Text.Bold" parent="android:TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="Text.Icon" parent="android:TextAppearance">
+        <item name="fontPath">@string/icon_font_path</item>
+    </style>
 </resources>
