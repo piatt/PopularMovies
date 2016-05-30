@@ -3,22 +3,17 @@ package com.piatt.udacity.popularmovies.manager;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class PreferencesManager {
-    private final String LOG_TAG = PreferencesManager.class.getSimpleName();
+import com.piatt.udacity.popularmovies.MoviesApplication;
 
+public class PreferencesManager {
     private final String PREFERENCES_TAG = "POPULAR_MOVIES_PREFERENCES";
     private final String PREFERENCES_SORT_FILTER = "SORT_FILTER";
     private final String PREFERENCES_ITEM_POSITION = "ITEM_POSITION";
     private final String PREFERENCES_FAVORITES = "FAVORITES";
     private SharedPreferences sharedPreferences;
-    private static PreferencesManager preferencesManager = new PreferencesManager();
-
-    public static PreferencesManager getInstance() {
-        return preferencesManager;
-    }
 
     public PreferencesManager() {
-        sharedPreferences = ContextManager.getInstance().getContext().getSharedPreferences(PREFERENCES_TAG, Context.MODE_PRIVATE);
+        sharedPreferences = MoviesApplication.getApp().getSharedPreferences(PREFERENCES_TAG, Context.MODE_PRIVATE);
     }
 
 //    public int getCurrentMovieItem() {

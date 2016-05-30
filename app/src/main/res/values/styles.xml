@@ -1,4 +1,5 @@
 <resources>
+
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorAccent">@color/light_blue</item>
         <item name="colorPrimary">@color/blue</item>
@@ -8,17 +9,25 @@
     <style name="Text.Light" parent="android:TextAppearance">
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
+
     <style name="Text.Medium" parent="android:TextAppearance">
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
+
     <style name="Text.Regular" parent="android:TextAppearance">
         <item name="android:fontFamily">sans-serif</item>
     </style>
+
     <style name="Text.Bold" parent="android:TextAppearance">
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textStyle">bold</item>
     </style>
+
     <style name="Text.Icon" parent="android:TextAppearance">
         <item name="fontPath">@string/icon_font_path</item>
     </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 </resources>

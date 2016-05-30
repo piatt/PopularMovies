@@ -1,0 +1,133 @@
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/poster_view"
+                android:layout_width="@dimen/poster_height"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/space_16"
+                android:layout_gravity="center_horizontal"
+                android:adjustViewBounds="true"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/space_16"
+                android:layout_marginRight="@dimen/space_16"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/release_date_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textSize="@dimen/size_16"
+                    style="@style/Text.Medium"/>
+
+                <TextView
+                    android:id="@+id/rating_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textSize="@dimen/size_16"
+                    style="@style/Text.Medium"/>
+
+                <TextView
+                    android:id="@+id/runtime_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textSize="@dimen/size_16"
+                    style="@style/Text.Medium"/>
+
+                <TextView
+                    android:id="@+id/favorite_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textSize="@dimen/size_24"
+                    style="@style/Text.Icon"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/overview_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/space_16"
+                android:textSize="@dimen/size_16"
+                style="@style/Text.Regular"/>
+
+            <LinearLayout
+                android:id="@+id/videos_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/space_16"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/size_16"
+                    android:text="@string/videos_label"
+                    style="@style/Text.Medium"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/space_2"
+                    android:background="@color/blue"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/video_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/reviews_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/space_16"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/size_16"
+                    android:text="@string/reviews_label"
+                    style="@style/Text.Medium"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/space_2"
+                    android:background="@color/blue"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/review_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+</android.support.design.widget.CoordinatorLayout>
