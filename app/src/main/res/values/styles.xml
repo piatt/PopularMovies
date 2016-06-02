@@ -1,9 +1,18 @@
 <resources>
-
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorAccent">@color/light_blue</item>
         <item name="colorPrimary">@color/blue</item>
         <item name="colorPrimaryDark">@color/dark_blue</item>
+        <item name="android:windowBackground">@color/white</item>
+    </style>
+
+    <style name="CollapsedToolbarTitle" parent="Text.Regular">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/size_16</item>
+    </style>
+
+    <style name="ExpandedToolbarTitle" parent="Text.Bold">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/size_16</item>
     </style>
 
     <style name="Text.Light" parent="android:TextAppearance">
@@ -26,8 +35,4 @@
     <style name="Text.Icon" parent="android:TextAppearance">
         <item name="fontPath">@string/icon_font_path</item>
     </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 </resources>

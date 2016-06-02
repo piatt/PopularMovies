@@ -2,8 +2,10 @@ package com.piatt.udacity.popularmovies.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +40,10 @@ public class MovieFragment extends Fragment {
     private static final String MOVIE_ID_KEY = "MOVIE_ID";
     @BindString(R.string.favorite_on_icon) String favoriteOnIcon;
     @BindString(R.string.favorite_off_icon) String favoriteOffIcon;
+    @BindView(R.id.back_button) TextView backButton;
+    @BindView(R.id.title_view) TextView titleView;
+    @BindView(R.id.app_bar_layout) AppBarLayout appBarLayout;
+    @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.poster_view) ImageView posterView;
     @BindView(R.id.release_date_view) TextView releaseDateView;
     @BindView(R.id.rating_view) TextView ratingView;
@@ -45,8 +51,10 @@ public class MovieFragment extends Fragment {
     @BindView(R.id.overview_view) TextView overviewView;
     @BindView(R.id.favorite_button) TextView favoriteButton;
     @BindView(R.id.videos_layout) LinearLayout videosLayout;
+    @BindView(R.id.videos_toggle_button) TextView videosToggleButton;
     @BindView(R.id.video_list) RecyclerView videoList;
     @BindView(R.id.reviews_layout) LinearLayout reviewsLayout;
+    @BindView(R.id.reviews_toggle_button) TextView reviewsToggleButton;
     @BindView(R.id.review_list) RecyclerView reviewList;
     private Unbinder unbinder;
 
@@ -97,6 +105,8 @@ public class MovieFragment extends Fragment {
     public void updateMovieFragment(MovieSelectionEvent event) {
         if (MoviesApplication.getApp().isLargeLayout()) {
             MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(event.getMovieId()).enqueue(movieDetailCallback);
+            MoviesApplication.getApp().getApiManager().getEndpoints().getMovieVideos(event.getMovieId()).enqueue(movieVideoCallback);
+            MoviesApplication.getApp().getApiManager().getEndpoints().getMovieReviews(event.getMovieId()).enqueue(movieReviewCallback);
         }
     }
 
@@ -106,6 +116,20 @@ public class MovieFragment extends Fragment {
             if (response.isSuccessful()) {
                 MovieDetail movieDetail = response.body();
                 Picasso.with(posterView.getContext()).load(movieDetail.getPosterUrl()).into(posterView);
+                titleView.setText(movieDetail.getTitle());
+                appBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
+                    int visibilityOffset = appBarLayout.getTotalScrollRange() - toolbar.getHeight();
+                    if (Math.abs(verticalOffset) >= visibilityOffset) {
+                        backButton.setVisibility(View.VISIBLE);
+                        titleView.setVisibility(View.VISIBLE);
+                        float alpha = (1f / toolbar.getHeight()) * (Math.abs(verticalOffset) - visibilityOffset);
+                        backButton.setAlpha(alpha);
+                        titleView.setAlpha(alpha);
+                    } else {
+                        backButton.setVisibility(View.INVISIBLE);
+                        titleView.setVisibility(View.INVISIBLE);
+                    }
+                });
                 releaseDateView.setText(movieDetail.getReleaseDate());
                 ratingView.setText(movieDetail.getRating());
                 runtimeView.setText(movieDetail.getRuntime());
@@ -148,9 +172,26 @@ public class MovieFragment extends Fragment {
         public void onFailure(Call<ApiResponse<MovieReview>> call, Throwable t) {}
     };
 
+    @OnClick(R.id.back_button)
+    public void onClick() {
+        getActivity().onBackPressed();
+    }
+
     @OnClick(R.id.favorite_button)
     public void onFavoriteButtonClick() {
         boolean isFavorite = favoriteButton.getText().equals(favoriteOnIcon);
         favoriteButton.setText(isFavorite ? favoriteOffIcon : favoriteOnIcon);
+    }
+
+    @OnClick(R.id.videos_toggle_button)
+    public void onVideosToggleButtonClick() {
+        videosToggleButton.setText(videoList.isShown() ? R.string.expand_icon : R.string.contract_icon);
+        videoList.setVisibility(videoList.isShown() ? View.GONE : View.VISIBLE);
+    }
+
+    @OnClick(R.id.reviews_toggle_button)
+    public void onReviewsToggleButtonClick() {
+        reviewsToggleButton.setText(reviewList.isShown() ? R.string.expand_icon : R.string.contract_icon);
+        reviewList.setVisibility(reviewList.isShown() ? View.GONE : View.VISIBLE);
     }
 }

@@ -1,6 +1,7 @@
 package com.piatt.udacity.popularmovies.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
 
     @Subscribe
     public void unregisterEventBus(EventBusUnregisterEvent event) {
+        Log.d(getClass().getSimpleName(), "EventBusUnregisterEvent");
         EventBus.getDefault().unregister(this);
     }
 

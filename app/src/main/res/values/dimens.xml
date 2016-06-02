@@ -1,6 +1,8 @@
 <resources>
     <dimen name="toolbar_height">56dp</dimen>
+    <dimen name="poster_height">400dp</dimen>
 
+    <dimen name="space_1">1dp</dimen>
     <dimen name="space_2">2dp</dimen>
     <dimen name="space_4">4dp</dimen>
     <dimen name="space_8">8dp</dimen>
@@ -20,21 +22,4 @@
     <dimen name="size_32">32sp</dimen>
     <dimen name="size_48">48sp</dimen>
     <dimen name="size_64">64sp</dimen>
-
-
-    <dimen name="poster_height">256dp</dimen>
-    <dimen name="detail_large_margin">32dp</dimen>
-    <dimen name="detail_medium_margin">16dp</dimen>
-    <dimen name="detail_small_margin">8dp</dimen>
-    <dimen name="detail_negative_margin">-4dp</dimen>
-    <dimen name="detail_title">20sp</dimen>
-    <dimen name="detail_large_text">22sp</dimen>
-    <dimen name="detail_label">10sp</dimen>
-    <dimen name="detail_divider">1dp</dimen>
-    <dimen name="detail_poster_width">150dp</dimen>
-    <dimen name="detail_videos_indicator">32sp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="app_bar_height">200dp</dimen>
-    <dimen name="item_width">200dp</dimen>
-    <dimen name="text_margin">16dp</dimen>
 </resources>

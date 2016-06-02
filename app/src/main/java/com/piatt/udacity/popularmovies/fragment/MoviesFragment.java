@@ -2,6 +2,7 @@ package com.piatt.udacity.popularmovies.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,8 +19,10 @@ import org.greenrobot.eventbus.Subscribe;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnItemSelected;
 
 public class MoviesFragment extends Fragment {
+    @BindView(R.id.coordinator_layout) CoordinatorLayout coordinatorLayout;
     @BindView(R.id.movie_list) RecyclerView movieList;
 
     @Override
@@ -36,18 +39,23 @@ public class MoviesFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (movieList == null) {
+        if (coordinatorLayout == null) {
             View view = inflater.inflate(R.layout.movies_fragment, container, false);
             ButterKnife.bind(this, view);
             movieList.setHasFixedSize(true);
             movieList.setLayoutManager(new GridLayoutManager(movieList.getContext(), MoviesApplication.getApp().isLargeLayout() ? 4 : 2));
             movieList.setAdapter(new MovieListingsAdapter());
         }
-        return movieList;
+        return coordinatorLayout;
     }
 
     @Subscribe
     public void updateMovieSort(MoviesUpdateEvent event) {
         movieList.getLayoutManager().scrollToPosition(0);
+    }
+
+    @OnItemSelected(R.id.sort_spinner)
+    public void onItemSelected(int position) {
+        EventBus.getDefault().post(new MoviesUpdateEvent(position));
     }
 }
