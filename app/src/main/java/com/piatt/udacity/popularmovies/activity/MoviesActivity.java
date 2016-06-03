@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.piatt.udacity.popularmovies.MoviesApplication;
 import com.piatt.udacity.popularmovies.R;
@@ -39,7 +38,6 @@ public class MoviesActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Log.d(getClass().getSimpleName(), "EventBusUnregisterEvent");
         EventBus.getDefault().post(new EventBusUnregisterEvent());
         EventBus.getDefault().unregister(this);
         super.onDestroy();

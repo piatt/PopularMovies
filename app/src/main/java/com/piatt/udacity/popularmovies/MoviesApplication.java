@@ -8,7 +8,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.piatt.udacity.popularmovies.manager.ApiManager;
-import com.piatt.udacity.popularmovies.manager.PreferencesManager;
+import com.piatt.udacity.popularmovies.manager.FavoritesManager;
 
 import lombok.Getter;
 
@@ -17,7 +17,7 @@ public class MoviesApplication extends Application {
 
     private ConnectivityManager connectivityManager;
     @Getter private ApiManager apiManager;
-    @Getter private PreferencesManager preferencesManager;
+    @Getter private FavoritesManager favoritesManager;
     @Getter private static MoviesApplication app;
 
     @Override
@@ -26,7 +26,7 @@ public class MoviesApplication extends Application {
         app = this;
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         apiManager = new ApiManager();
-        preferencesManager = new PreferencesManager();
+        favoritesManager = new FavoritesManager();
     }
 
     public boolean isLargeLayout() {

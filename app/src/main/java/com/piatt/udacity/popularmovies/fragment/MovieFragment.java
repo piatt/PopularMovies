@@ -60,6 +60,7 @@ public class MovieFragment extends Fragment {
     @BindView(R.id.reviews_layout) LinearLayout reviewsLayout;
     @BindView(R.id.reviews_toggle_view) TextView reviewsToggleView;
     @BindView(R.id.review_list) RecyclerView reviewList;
+    private int movieId;
     private Unbinder unbinder;
 
     public static MovieFragment newInstance(int movieId) {
@@ -73,7 +74,7 @@ public class MovieFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int movieId = getArguments().getInt(MOVIE_ID_KEY);
+        movieId = getArguments().getInt(MOVIE_ID_KEY);
         MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(movieId).enqueue(movieDetailCallback);
         MoviesApplication.getApp().getApiManager().getEndpoints().getMovieVideos(movieId).enqueue(movieVideoCallback);
         MoviesApplication.getApp().getApiManager().getEndpoints().getMovieReviews(movieId).enqueue(movieReviewCallback);
@@ -125,7 +126,7 @@ public class MovieFragment extends Fragment {
                 ratingView.setText(movieDetail.getRating());
                 runtimeView.setText(movieDetail.getRuntime());
                 overviewView.setText(movieDetail.getOverview());
-                favoriteButton.setText(favoriteOffIcon);
+                favoriteButton.setText(MoviesApplication.getApp().getFavoritesManager().isFavoriteMovie(movieId) ? favoriteOnIcon : favoriteOffIcon);
                 configureToolbar();
             }
         }
@@ -197,8 +198,13 @@ public class MovieFragment extends Fragment {
 
     @OnClick(R.id.favorite_button)
     public void onFavoriteButtonClick() {
-        boolean isFavorite = favoriteButton.getText().equals(favoriteOnIcon);
-        favoriteButton.setText(isFavorite ? favoriteOffIcon : favoriteOnIcon);
+        if (MoviesApplication.getApp().getFavoritesManager().isFavoriteMovie(movieId)) {
+            favoriteButton.setText(favoriteOffIcon);
+            MoviesApplication.getApp().getFavoritesManager().removeFavoriteMovie(movieId);
+        } else {
+            favoriteButton.setText(favoriteOnIcon);
+            MoviesApplication.getApp().getFavoritesManager().addFavoriteMovie(movieId);
+        }
     }
 
     @OnClick(R.id.videos_toggle_button)

@@ -8,11 +8,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Spinner;
 
 import com.piatt.udacity.popularmovies.MoviesApplication;
 import com.piatt.udacity.popularmovies.R;
 import com.piatt.udacity.popularmovies.adapter.MovieListingsAdapter;
 import com.piatt.udacity.popularmovies.event.MoviesUpdateEvent;
+import com.piatt.udacity.popularmovies.model.MovieFilter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -23,12 +25,22 @@ import butterknife.OnItemSelected;
 
 public class MoviesFragment extends Fragment {
     @BindView(R.id.coordinator_layout) CoordinatorLayout coordinatorLayout;
+    @BindView(R.id.sort_spinner) Spinner sortSpinner;
     @BindView(R.id.movie_list) RecyclerView movieList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MoviesUpdateEvent moviesUpdateEvent = new MoviesUpdateEvent(sortSpinner.getSelectedItemPosition());
+        if (moviesUpdateEvent.getMovieFilter().equals(MovieFilter.FAVORITES)) {
+            EventBus.getDefault().post(moviesUpdateEvent);
+        }
     }
 
     @Override

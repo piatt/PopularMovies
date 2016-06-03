@@ -1,7 +1,6 @@
 package com.piatt.udacity.popularmovies.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +44,6 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
 
     @Subscribe
     public void unregisterEventBus(EventBusUnregisterEvent event) {
-        Log.d(getClass().getSimpleName(), "EventBusUnregisterEvent");
         EventBus.getDefault().unregister(this);
     }
 
@@ -60,10 +58,26 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
                 break;
             case TOP_RATED: MoviesApplication.getApp().getApiManager().getEndpoints().getTopRatedMovies().enqueue(movieListingCallback);
                 break;
-            case FAVORITES: MoviesApplication.getApp().getApiManager().getEndpoints().getFavoriteMovies().enqueue(movieListingCallback);
+            case FAVORITES: getFavoriteMovies();
                 break;
         }
     }
+
+    private Callback<MovieDetail> movieCallback = new Callback<MovieDetail>() {
+        @Override
+        public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
+            if (response.isSuccessful()) {
+                movieListings.add(response.body());
+                notifyItemInserted(movieListings.size() - 1);
+                if (MoviesApplication.getApp().isLargeLayout() && movieListings.size() == 1) {
+                    selectMovie(0);
+                }
+            }
+        }
+
+        @Override
+        public void onFailure(Call<MovieDetail> call, Throwable t) {}
+    };
 
     /**
      * Upon receipt of data, either from the network or cache,
@@ -120,6 +134,13 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
         @Override
         public void onFailure(Call<ApiResponse<MovieReview>> call, Throwable t) {}
     };
+
+    private void getFavoriteMovies() {
+        List<Integer> favoriteMovies = MoviesApplication.getApp().getFavoritesManager().getFavoriteMovies();
+        movieListings.clear();
+        notifyDataSetChanged();
+        Stream.of(favoriteMovies).forEach(movieId -> MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(movieId).enqueue(movieCallback));
+    }
 
     private void fetchMovieDetails() {
         Stream.of(movieListings).forEach(movieListing -> {

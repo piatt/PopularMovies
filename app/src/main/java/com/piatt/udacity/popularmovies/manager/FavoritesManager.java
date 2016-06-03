@@ -3,17 +3,23 @@ package com.piatt.udacity.popularmovies.manager;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.annimon.stream.Stream;
 import com.piatt.udacity.popularmovies.MoviesApplication;
 
-public class PreferencesManager {
-    private final String PREFERENCES_TAG = "POPULAR_MOVIES_PREFERENCES";
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class FavoritesManager {
+    private final String PREFERENCES_KEY = "MOVIES_PREFERENCES";
     private final String PREFERENCES_SORT_FILTER = "SORT_FILTER";
     private final String PREFERENCES_ITEM_POSITION = "ITEM_POSITION";
-    private final String PREFERENCES_FAVORITES = "FAVORITES";
+    private final String FAVORITES_KEY = "FAVORITES";
     private SharedPreferences sharedPreferences;
 
-    public PreferencesManager() {
-        sharedPreferences = MoviesApplication.getApp().getSharedPreferences(PREFERENCES_TAG, Context.MODE_PRIVATE);
+    public FavoritesManager() {
+        sharedPreferences = MoviesApplication.getApp().getSharedPreferences(PREFERENCES_KEY, Context.MODE_PRIVATE);
     }
 
 //    public int getCurrentMovieItem() {
@@ -56,28 +62,26 @@ public class PreferencesManager {
 //        sharedPreferences.edit().putString(PREFERENCES_SORT_FILTER, sortFilter).commit();
 //    }
 //
-//    public ArrayList<Integer> getCurrentFavorites() {
-//        ArrayList<Integer> favorites = new ArrayList<>();
-//        Set<String> storedFavorites = sharedPreferences.getStringSet(PREFERENCES_FAVORITES, new HashSet<String>());
-//        for (String favorite : storedFavorites) {
-//            favorites.add(Integer.parseInt(favorite));
-//        }
-//        return favorites;
-//    }
-//
-//    public void addFavorite(int favorite) {
-//        Set<String> storedFavorites = sharedPreferences.getStringSet(PREFERENCES_FAVORITES, new HashSet<String>());
-//        storedFavorites.add(String.valueOf(favorite));
-//        sharedPreferences.edit().putStringSet(PREFERENCES_FAVORITES, storedFavorites).commit();
-//    }
-//
-//    public void removeFavorite(int favorite) {
-//        Set<String> storedFavorites = sharedPreferences.getStringSet(PREFERENCES_FAVORITES, new HashSet<String>());
-//        storedFavorites.remove(String.valueOf(favorite));
-//        sharedPreferences.edit().putStringSet(PREFERENCES_FAVORITES, storedFavorites).commit();
-//    }
-//
-//    public boolean isFavorite(int movieId) {
-//        return getCurrentFavorites().contains(Integer.valueOf(movieId));
-//    }
+    public List<Integer> getFavoriteMovies() {
+        List<Integer> favorites = new ArrayList<>();
+        Set<String> storedFavorites = sharedPreferences.getStringSet(FAVORITES_KEY, new HashSet<>());
+        Stream.of(storedFavorites).forEach(favorite -> favorites.add(Integer.parseInt(favorite)));
+        return favorites;
+    }
+
+    public void addFavoriteMovie(int movieId) {
+        Set<String> storedFavorites = sharedPreferences.getStringSet(FAVORITES_KEY, new HashSet<>());
+        storedFavorites.add(String.valueOf(movieId));
+        sharedPreferences.edit().putStringSet(FAVORITES_KEY, storedFavorites).commit();
+    }
+
+    public void removeFavoriteMovie(int movieId) {
+        Set<String> storedFavorites = sharedPreferences.getStringSet(FAVORITES_KEY, new HashSet<>());
+        storedFavorites.remove(String.valueOf(movieId));
+        sharedPreferences.edit().putStringSet(FAVORITES_KEY, storedFavorites).commit();
+    }
+
+    public boolean isFavoriteMovie(int movieId) {
+        return getFavoriteMovies().contains(Integer.valueOf(movieId));
+    }
 }
