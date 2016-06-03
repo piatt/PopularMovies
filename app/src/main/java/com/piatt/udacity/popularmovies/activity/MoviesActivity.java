@@ -1,5 +1,6 @@
 package com.piatt.udacity.popularmovies.activity;
 
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -8,7 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.piatt.udacity.popularmovies.MoviesApplication;
 import com.piatt.udacity.popularmovies.R;
 import com.piatt.udacity.popularmovies.event.EventBusUnregisterEvent;
-import com.piatt.udacity.popularmovies.event.MovieSelectionEvent;
+import com.piatt.udacity.popularmovies.event.MovieSelectEvent;
 import com.piatt.udacity.popularmovies.fragment.MovieFragment;
 import com.piatt.udacity.popularmovies.fragment.MoviesFragment;
 
@@ -21,19 +22,12 @@ public class MoviesActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setRequestedOrientation(MoviesApplication.getApp().isLargeLayout() ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.movies_activity);
         EventBus.getDefault().register(this);
-
         if (!MoviesApplication.getApp().isLargeLayout()) {
             getFragmentManager().beginTransaction().add(R.id.fragment_container, new MoviesFragment()).commit();
         }
-    }
-
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(base));
     }
 
     @Override
@@ -44,18 +38,16 @@ public class MoviesActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        if (getFragmentManager().getBackStackEntryCount() == 1) {
-            getFragmentManager().popBackStackImmediate();
-        } else {
-            super.onBackPressed();
-        }
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(base));
     }
 
     @Subscribe
-    public void updateMovieFragment(MovieSelectionEvent event) {
+    public void onMovieSelect(MovieSelectEvent event) {
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction().replace(R.id.fragment_container, MovieFragment.newInstance(event.getMovieId()));
         if (!MoviesApplication.getApp().isLargeLayout()) {
-            getFragmentManager().beginTransaction().replace(R.id.fragment_container, MovieFragment.newInstance(event.getMovieId())).addToBackStack(MovieFragment.class.getSimpleName()).commit();
+            fragmentTransaction.addToBackStack(null);
         }
+        fragmentTransaction.commit();
     }
 }

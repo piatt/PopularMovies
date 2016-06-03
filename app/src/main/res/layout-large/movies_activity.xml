@@ -11,9 +11,8 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"/>
 
-    <fragment
-        android:id="@+id/movie_fragment"
-        android:name="com.piatt.udacity.popularmovies.fragment.MovieFragment"
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="match_parent"/>

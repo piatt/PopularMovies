@@ -3,6 +3,7 @@ package com.piatt.udacity.popularmovies.fragment;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -17,8 +18,8 @@ import com.piatt.udacity.popularmovies.MoviesApplication;
 import com.piatt.udacity.popularmovies.R;
 import com.piatt.udacity.popularmovies.adapter.MovieReviewsAdapter;
 import com.piatt.udacity.popularmovies.adapter.MovieVideosAdapter;
-import com.piatt.udacity.popularmovies.event.MovieSelectionEvent;
-import com.piatt.udacity.popularmovies.event.MovieShareEvent;
+import com.piatt.udacity.popularmovies.event.FavoritesUpdateEvent;
+import com.piatt.udacity.popularmovies.event.MovieVideoShareEvent;
 import com.piatt.udacity.popularmovies.model.ApiResponse;
 import com.piatt.udacity.popularmovies.model.MovieDetail;
 import com.piatt.udacity.popularmovies.model.MovieReview;
@@ -26,7 +27,6 @@ import com.piatt.udacity.popularmovies.model.MovieVideo;
 import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import butterknife.BindString;
 import butterknife.BindView;
@@ -39,11 +39,12 @@ import retrofit2.Response;
 
 public class MovieFragment extends Fragment {
     private static final String MOVIE_ID_KEY = "MOVIE_ID";
-    private final int INVALID_MOVIE_ID = -1;
     @BindString(R.string.favorite_on_icon) String favoriteOnIcon;
     @BindString(R.string.favorite_off_icon) String favoriteOffIcon;
     @BindString(R.string.contract_icon) String contractIcon;
     @BindString(R.string.expand_icon) String expandIcon;
+    @BindString(R.string.add_favorite_message) String addFavoriteMessage;
+    @BindString(R.string.remove_favorite_message) String removeFavoriteMessage;
     @BindView(R.id.back_button) TextView backButton;
     @BindView(R.id.title_view) TextView titleView;
     @BindView(R.id.share_button) TextView shareButton;
@@ -75,17 +76,10 @@ public class MovieFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
-        movieId = getArguments() != null ? getArguments().getInt(MOVIE_ID_KEY) : INVALID_MOVIE_ID;
-        if (movieId != INVALID_MOVIE_ID) {
-            fetchMovieDetails(movieId);
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        EventBus.getDefault().unregister(this);
-        super.onDestroy();
+        movieId = getArguments().getInt(MOVIE_ID_KEY);
+        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(movieId).enqueue(movieDetailCallback);
+        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieVideos(movieId).enqueue(movieVideoCallback);
+        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieReviews(movieId).enqueue(movieReviewCallback);
     }
 
     /**
@@ -105,20 +99,6 @@ public class MovieFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-    }
-
-    @Subscribe
-    public void updateMovieFragment(MovieSelectionEvent event) {
-        if (MoviesApplication.getApp().isLargeLayout()) {
-            movieId = event.getMovieId();
-            fetchMovieDetails(movieId);
-        }
-    }
-
-    private void fetchMovieDetails(int movieId) {
-        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(movieId).enqueue(movieDetailCallback);
-        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieVideos(movieId).enqueue(movieVideoCallback);
-        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieReviews(movieId).enqueue(movieReviewCallback);
     }
 
     private Callback<MovieDetail> movieDetailCallback = new Callback<MovieDetail>() {
@@ -176,8 +156,10 @@ public class MovieFragment extends Fragment {
             int visibilityOffset = appBarLayout.getTotalScrollRange() - toolbar.getHeight();
             if (Math.abs(verticalOffset) >= visibilityOffset) {
                 float alpha = (1f / toolbar.getHeight()) * (Math.abs(verticalOffset) - visibilityOffset);
-                backButton.setVisibility(View.VISIBLE);
-                backButton.setAlpha(alpha);
+                if (!MoviesApplication.getApp().isLargeLayout()) {
+                    backButton.setVisibility(View.VISIBLE);
+                    backButton.setAlpha(alpha);
+                }
                 titleView.setVisibility(View.VISIBLE);
                 titleView.setAlpha(alpha);
                 if (videosLayout.isShown()) {
@@ -185,7 +167,9 @@ public class MovieFragment extends Fragment {
                     shareButton.setAlpha(alpha);
                 }
             } else {
-                backButton.setVisibility(View.INVISIBLE);
+                if (!MoviesApplication.getApp().isLargeLayout()) {
+                    backButton.setVisibility(View.INVISIBLE);
+                }
                 titleView.setVisibility(View.INVISIBLE);
                 shareButton.setVisibility(View.INVISIBLE);
             }
@@ -199,18 +183,23 @@ public class MovieFragment extends Fragment {
 
     @OnClick(R.id.share_button)
     public void onShareButtonClick() {
-        EventBus.getDefault().post(new MovieShareEvent());
+        EventBus.getDefault().post(new MovieVideoShareEvent());
     }
 
     @OnClick(R.id.favorite_button)
     public void onFavoriteButtonClick() {
+        String snackbarMessage;
         if (MoviesApplication.getApp().getFavoritesManager().isFavoriteMovie(movieId)) {
             favoriteButton.setText(favoriteOffIcon);
             MoviesApplication.getApp().getFavoritesManager().removeFavoriteMovie(movieId);
+            snackbarMessage = String.format(removeFavoriteMessage, titleView.getText().toString());
         } else {
             favoriteButton.setText(favoriteOnIcon);
             MoviesApplication.getApp().getFavoritesManager().addFavoriteMovie(movieId);
+            snackbarMessage = String.format(addFavoriteMessage, titleView.getText().toString());
         }
+        Snackbar.make(favoriteButton, snackbarMessage, Snackbar.LENGTH_SHORT).show();
+        EventBus.getDefault().post(new FavoritesUpdateEvent());
     }
 
     @OnClick(R.id.videos_toggle_button)

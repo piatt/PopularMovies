@@ -10,8 +10,8 @@ import com.annimon.stream.Stream;
 import com.piatt.udacity.popularmovies.MoviesApplication;
 import com.piatt.udacity.popularmovies.R;
 import com.piatt.udacity.popularmovies.event.EventBusUnregisterEvent;
-import com.piatt.udacity.popularmovies.event.MovieSelectionEvent;
-import com.piatt.udacity.popularmovies.event.MoviesUpdateEvent;
+import com.piatt.udacity.popularmovies.event.MovieSelectEvent;
+import com.piatt.udacity.popularmovies.event.MovieFilterEvent;
 import com.piatt.udacity.popularmovies.model.ApiResponse;
 import com.piatt.udacity.popularmovies.model.MovieDetail;
 import com.piatt.udacity.popularmovies.model.MovieFilter;
@@ -39,7 +39,7 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
 
     public MovieListingsAdapter() {
         EventBus.getDefault().register(this);
-        EventBus.getDefault().post(new MoviesUpdateEvent(MovieFilter.POPULAR));
+        EventBus.getDefault().post(new MovieFilterEvent(MovieFilter.POPULAR));
     }
 
     @Subscribe
@@ -52,7 +52,7 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
      * and fetches the appropriate data for the sort type.
      */
     @Subscribe
-    public void updateMovieSort(MoviesUpdateEvent event) {
+    public void onMovieFilter(MovieFilterEvent event) {
         switch (event.getMovieFilter()) {
             case POPULAR: MoviesApplication.getApp().getApiManager().getEndpoints().getPopularMovies().enqueue(movieListingCallback);
                 break;
@@ -152,7 +152,7 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
     }
 
     private void selectMovie(int position) {
-        EventBus.getDefault().post(new MovieSelectionEvent(movieListings.get(position).getId()));
+        EventBus.getDefault().post(new MovieSelectEvent(movieListings.get(position).getId()));
         if (MoviesApplication.getApp().isLargeLayout()) {
             notifyItemChanged(selectedPosition);
             selectedPosition = position;

@@ -13,7 +13,8 @@ import android.widget.Spinner;
 import com.piatt.udacity.popularmovies.MoviesApplication;
 import com.piatt.udacity.popularmovies.R;
 import com.piatt.udacity.popularmovies.adapter.MovieListingsAdapter;
-import com.piatt.udacity.popularmovies.event.MoviesUpdateEvent;
+import com.piatt.udacity.popularmovies.event.FavoritesUpdateEvent;
+import com.piatt.udacity.popularmovies.event.MovieFilterEvent;
 import com.piatt.udacity.popularmovies.model.MovieFilter;
 
 import org.greenrobot.eventbus.EventBus;
@@ -25,22 +26,13 @@ import butterknife.OnItemSelected;
 
 public class MoviesFragment extends Fragment {
     @BindView(R.id.coordinator_layout) CoordinatorLayout coordinatorLayout;
-    @BindView(R.id.sort_spinner) Spinner sortSpinner;
+    @BindView(R.id.filter_spinner) Spinner filterSpinner;
     @BindView(R.id.movie_list) RecyclerView movieList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        MoviesUpdateEvent moviesUpdateEvent = new MoviesUpdateEvent(sortSpinner.getSelectedItemPosition());
-        if (moviesUpdateEvent.getMovieFilter().equals(MovieFilter.FAVORITES)) {
-            EventBus.getDefault().post(moviesUpdateEvent);
-        }
     }
 
     @Override
@@ -62,12 +54,20 @@ public class MoviesFragment extends Fragment {
     }
 
     @Subscribe
-    public void updateMovieSort(MoviesUpdateEvent event) {
+    public void onMovieFilter(MovieFilterEvent event) {
         movieList.getLayoutManager().scrollToPosition(0);
     }
 
-    @OnItemSelected(R.id.sort_spinner)
-    public void onItemSelected(int position) {
-        EventBus.getDefault().post(new MoviesUpdateEvent(position));
+    @Subscribe
+    public void onFavoritesUpdate(FavoritesUpdateEvent event) {
+        MovieFilterEvent movieFilterEvent = new MovieFilterEvent(filterSpinner.getSelectedItemPosition());
+        if (movieFilterEvent.getMovieFilter().equals(MovieFilter.FAVORITES)) {
+            EventBus.getDefault().post(movieFilterEvent);
+        }
+    }
+
+    @OnItemSelected(R.id.filter_spinner)
+    public void onFilterSpinnerItemSelected(int position) {
+        EventBus.getDefault().post(new MovieFilterEvent(position));
     }
 }

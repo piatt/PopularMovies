@@ -1,8 +1,5 @@
 <resources>
-    <color name="light_blue">#80D8FF</color>
     <color name="blue">#0277BD</color>
     <color name="dark_blue">#01579B</color>
     <color name="white">#FFFFFF</color>
-    <color name="detail_primary">#B00000</color>
-    <color name="translucent_black">#25000000</color>
 </resources>

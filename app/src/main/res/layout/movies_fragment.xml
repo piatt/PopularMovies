@@ -11,20 +11,41 @@
 
         <android.support.v7.widget.Toolbar
             android:layout_width="match_parent"
-            android:layout_height="@dimen/toolbar_height"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark"
-            app:logo="@mipmap/launcher"
-            app:title="@string/app_name"
-            app:titleMarginStart="@dimen/space_32">
+            android:layout_height="@dimen/toolbar_height">
 
-            <Spinner
-                android:id="@+id/sort_spinner"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="right"
-                android:entries="@array/sort_array"
-                android:popupTheme="@style/AppTheme"/>
+                android:orientation="horizontal">
 
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:src="@mipmap/launcher"/>
+
+                <TextView
+                    android:id="@+id/title_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="@dimen/space_16"
+                    android:layout_marginRight="@dimen/space_16"
+                    android:gravity="center_vertical"
+                    android:textSize="@dimen/size_20"
+                    android:textColor="@color/white"
+                    android:text="@string/app_name"
+                    style="@style/Text.Medium"/>
+
+                <Spinner
+                    android:id="@+id/filter_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:entries="@array/filter_array"
+                    android:popupTheme="@style/AppTheme"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark"/>
+
+            </LinearLayout>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 

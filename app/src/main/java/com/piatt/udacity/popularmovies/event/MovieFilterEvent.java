@@ -5,10 +5,10 @@ import com.piatt.udacity.popularmovies.model.MovieFilter;
 import lombok.Getter;
 import lombok.Setter;
 
-public class MoviesUpdateEvent {
+public class MovieFilterEvent {
     @Getter @Setter private MovieFilter movieFilter;
 
-    public MoviesUpdateEvent(int position) {
+    public MovieFilterEvent(int position) {
         switch (position) {
             case 0: setMovieFilter(MovieFilter.POPULAR);
                 break;
@@ -19,7 +19,7 @@ public class MoviesUpdateEvent {
         }
     }
 
-    public MoviesUpdateEvent(MovieFilter movieFilter) {
+    public MovieFilterEvent(MovieFilter movieFilter) {
         setMovieFilter(movieFilter);
     }
 }

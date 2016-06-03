@@ -3,10 +3,10 @@ package com.piatt.udacity.popularmovies.event;
 import lombok.Getter;
 import lombok.Setter;
 
-public class MovieSelectionEvent {
+public class MovieSelectEvent {
     @Getter @Setter private int movieId;
 
-    public MovieSelectionEvent(int movieId) {
+    public MovieSelectEvent(int movieId) {
         setMovieId(movieId);
     }
 }

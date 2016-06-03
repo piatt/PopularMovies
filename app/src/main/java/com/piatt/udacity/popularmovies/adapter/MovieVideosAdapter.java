@@ -12,7 +12,7 @@ import com.piatt.udacity.popularmovies.MoviesApplication;
 import com.piatt.udacity.popularmovies.R;
 import com.piatt.udacity.popularmovies.adapter.MovieVideosAdapter.MovieVideoViewHolder;
 import com.piatt.udacity.popularmovies.event.EventBusUnregisterEvent;
-import com.piatt.udacity.popularmovies.event.MovieShareEvent;
+import com.piatt.udacity.popularmovies.event.MovieVideoShareEvent;
 import com.piatt.udacity.popularmovies.model.MovieVideo;
 
 import org.greenrobot.eventbus.EventBus;
@@ -40,14 +40,15 @@ public class MovieVideosAdapter extends RecyclerView.Adapter<MovieVideoViewHolde
     }
 
     @Subscribe
-    public void shareMovieVideo(MovieShareEvent event) {
+    public void onMovieVideoShare(MovieVideoShareEvent event) {
         if (!movieVideos.isEmpty()) {
             String videoUrl = movieVideos.get(0).getVideoUrl();
             Intent shareIntent = new Intent();
             shareIntent.setAction(Intent.ACTION_SEND);
             shareIntent.putExtra(Intent.EXTRA_TEXT, videoUrl);
             shareIntent.setType("text/plain");
-            MoviesApplication.getApp().startActivity(Intent.createChooser(shareIntent, "Share link").setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            String chooserTitle = MoviesApplication.getApp().getString(R.string.share_chooser_title);
+            MoviesApplication.getApp().startActivity(Intent.createChooser(shareIntent, chooserTitle).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         }
     }
 
