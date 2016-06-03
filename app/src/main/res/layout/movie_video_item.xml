@@ -1,34 +1,26 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/play_button"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
     android:orientation="horizontal">
 
     <TextView
-        android:id="@+id/title_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:textSize="@dimen/size_16"
-        style="@style/Text.Regular"/>
-
-    <TextView
-        android:id="@+id/play_button"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:padding="@dimen/space_12"
+        android:layout_margin="@dimen/space_12"
         android:textSize="@dimen/size_24"
         android:text="@string/play_icon"
         style="@style/Text.Icon"/>
 
     <TextView
-        android:id="@+id/share_button"
+        android:id="@+id/title_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:padding="@dimen/space_12"
-        android:textSize="@dimen/size_24"
-        android:text="@string/share_icon"
-        style="@style/Text.Icon"/>
+        android:layout_marginLeft="@dimen/space_4"
+        android:gravity="center_vertical"
+        android:textSize="@dimen/size_16"
+        style="@style/Text.Regular"/>
 
 </LinearLayout>

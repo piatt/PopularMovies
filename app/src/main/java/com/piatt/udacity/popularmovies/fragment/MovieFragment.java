@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.piatt.udacity.popularmovies.MoviesApplication;
 import com.piatt.udacity.popularmovies.R;
@@ -40,8 +41,11 @@ public class MovieFragment extends Fragment {
     private static final String MOVIE_ID_KEY = "MOVIE_ID";
     @BindString(R.string.favorite_on_icon) String favoriteOnIcon;
     @BindString(R.string.favorite_off_icon) String favoriteOffIcon;
+    @BindString(R.string.contract_icon) String contractIcon;
+    @BindString(R.string.expand_icon) String expandIcon;
     @BindView(R.id.back_button) TextView backButton;
     @BindView(R.id.title_view) TextView titleView;
+    @BindView(R.id.share_button) TextView shareButton;
     @BindView(R.id.app_bar_layout) AppBarLayout appBarLayout;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.poster_view) ImageView posterView;
@@ -51,10 +55,10 @@ public class MovieFragment extends Fragment {
     @BindView(R.id.overview_view) TextView overviewView;
     @BindView(R.id.favorite_button) TextView favoriteButton;
     @BindView(R.id.videos_layout) LinearLayout videosLayout;
-    @BindView(R.id.videos_toggle_button) TextView videosToggleButton;
+    @BindView(R.id.videos_toggle_view) TextView videosToggleView;
     @BindView(R.id.video_list) RecyclerView videoList;
     @BindView(R.id.reviews_layout) LinearLayout reviewsLayout;
-    @BindView(R.id.reviews_toggle_button) TextView reviewsToggleButton;
+    @BindView(R.id.reviews_toggle_view) TextView reviewsToggleView;
     @BindView(R.id.review_list) RecyclerView reviewList;
     private Unbinder unbinder;
 
@@ -117,24 +121,12 @@ public class MovieFragment extends Fragment {
                 MovieDetail movieDetail = response.body();
                 Picasso.with(posterView.getContext()).load(movieDetail.getPosterUrl()).into(posterView);
                 titleView.setText(movieDetail.getTitle());
-                appBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
-                    int visibilityOffset = appBarLayout.getTotalScrollRange() - toolbar.getHeight();
-                    if (Math.abs(verticalOffset) >= visibilityOffset) {
-                        backButton.setVisibility(View.VISIBLE);
-                        titleView.setVisibility(View.VISIBLE);
-                        float alpha = (1f / toolbar.getHeight()) * (Math.abs(verticalOffset) - visibilityOffset);
-                        backButton.setAlpha(alpha);
-                        titleView.setAlpha(alpha);
-                    } else {
-                        backButton.setVisibility(View.INVISIBLE);
-                        titleView.setVisibility(View.INVISIBLE);
-                    }
-                });
                 releaseDateView.setText(movieDetail.getReleaseDate());
                 ratingView.setText(movieDetail.getRating());
                 runtimeView.setText(movieDetail.getRuntime());
                 overviewView.setText(movieDetail.getOverview());
                 favoriteButton.setText(favoriteOffIcon);
+                configureToolbar();
             }
         }
 
@@ -172,9 +164,35 @@ public class MovieFragment extends Fragment {
         public void onFailure(Call<ApiResponse<MovieReview>> call, Throwable t) {}
     };
 
+    private void configureToolbar() {
+        appBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
+            int visibilityOffset = appBarLayout.getTotalScrollRange() - toolbar.getHeight();
+            if (Math.abs(verticalOffset) >= visibilityOffset) {
+                float alpha = (1f / toolbar.getHeight()) * (Math.abs(verticalOffset) - visibilityOffset);
+                backButton.setVisibility(View.VISIBLE);
+                backButton.setAlpha(alpha);
+                titleView.setVisibility(View.VISIBLE);
+                titleView.setAlpha(alpha);
+                if (videosLayout.isShown()) {
+                    shareButton.setVisibility(View.VISIBLE);
+                    shareButton.setAlpha(alpha);
+                }
+            } else {
+                backButton.setVisibility(View.INVISIBLE);
+                titleView.setVisibility(View.INVISIBLE);
+                shareButton.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
     @OnClick(R.id.back_button)
-    public void onClick() {
+    public void onBackButtonClick() {
         getActivity().onBackPressed();
+    }
+
+    @OnClick(R.id.share_button)
+    public void onShareButtonClick() {
+        Toast.makeText(shareButton.getContext(), "SHARE", Toast.LENGTH_SHORT).show();
     }
 
     @OnClick(R.id.favorite_button)
@@ -185,13 +203,13 @@ public class MovieFragment extends Fragment {
 
     @OnClick(R.id.videos_toggle_button)
     public void onVideosToggleButtonClick() {
-        videosToggleButton.setText(videoList.isShown() ? R.string.expand_icon : R.string.contract_icon);
+        videosToggleView.setText(videoList.isShown() ? expandIcon : contractIcon);
         videoList.setVisibility(videoList.isShown() ? View.GONE : View.VISIBLE);
     }
 
     @OnClick(R.id.reviews_toggle_button)
     public void onReviewsToggleButtonClick() {
-        reviewsToggleButton.setText(reviewList.isShown() ? R.string.expand_icon : R.string.contract_icon);
+        reviewsToggleView.setText(reviewList.isShown() ? expandIcon : contractIcon);
         reviewList.setVisibility(reviewList.isShown() ? View.GONE : View.VISIBLE);
     }
 }
