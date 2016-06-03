@@ -12,13 +12,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.piatt.udacity.popularmovies.MoviesApplication;
 import com.piatt.udacity.popularmovies.R;
 import com.piatt.udacity.popularmovies.adapter.MovieReviewsAdapter;
 import com.piatt.udacity.popularmovies.adapter.MovieVideosAdapter;
 import com.piatt.udacity.popularmovies.event.MovieSelectionEvent;
+import com.piatt.udacity.popularmovies.event.MovieShareEvent;
 import com.piatt.udacity.popularmovies.model.ApiResponse;
 import com.piatt.udacity.popularmovies.model.MovieDetail;
 import com.piatt.udacity.popularmovies.model.MovieReview;
@@ -192,7 +192,7 @@ public class MovieFragment extends Fragment {
 
     @OnClick(R.id.share_button)
     public void onShareButtonClick() {
-        Toast.makeText(shareButton.getContext(), "SHARE", Toast.LENGTH_SHORT).show();
+        EventBus.getDefault().post(new MovieShareEvent());
     }
 
     @OnClick(R.id.favorite_button)
