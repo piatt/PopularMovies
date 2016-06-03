@@ -154,9 +154,9 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
     private void selectMovie(int position) {
         EventBus.getDefault().post(new MovieSelectionEvent(movieListings.get(position).getId()));
         if (MoviesApplication.getApp().isLargeLayout()) {
-            notifyItemChanged(selectedPosition, false);
+            notifyItemChanged(selectedPosition);
             selectedPosition = position;
-            notifyItemChanged(selectedPosition, true);
+            notifyItemChanged(selectedPosition);
         }
     }
 
@@ -174,15 +174,7 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
     @Override
     public void onBindViewHolder(MovieListingViewHolder holder, int position) {
         Picasso.with(holder.itemView.getContext()).load(movieListings.get(position).getPosterUrl()).into(holder.posterView);
-    }
-
-    @Override
-    public void onBindViewHolder(MovieListingViewHolder holder, int position, List<Object> payloads) {
-        if (payloads.isEmpty()) {
-            onBindViewHolder(holder, position);
-        } else if (MoviesApplication.getApp().isLargeLayout()) {
-            holder.indicatorView.setVisibility(position == selectedPosition ? View.VISIBLE : View.INVISIBLE);
-        }
+        holder.indicatorView.setVisibility(position == selectedPosition ? View.VISIBLE : View.INVISIBLE);
     }
 
     public class MovieListingViewHolder extends RecyclerView.ViewHolder {

@@ -39,6 +39,7 @@ import retrofit2.Response;
 
 public class MovieFragment extends Fragment {
     private static final String MOVIE_ID_KEY = "MOVIE_ID";
+    private final int INVALID_MOVIE_ID = -1;
     @BindString(R.string.favorite_on_icon) String favoriteOnIcon;
     @BindString(R.string.favorite_off_icon) String favoriteOffIcon;
     @BindString(R.string.contract_icon) String contractIcon;
@@ -74,11 +75,11 @@ public class MovieFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        movieId = getArguments().getInt(MOVIE_ID_KEY);
-        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(movieId).enqueue(movieDetailCallback);
-        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieVideos(movieId).enqueue(movieVideoCallback);
-        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieReviews(movieId).enqueue(movieReviewCallback);
         EventBus.getDefault().register(this);
+        movieId = getArguments() != null ? getArguments().getInt(MOVIE_ID_KEY) : INVALID_MOVIE_ID;
+        if (movieId != INVALID_MOVIE_ID) {
+            fetchMovieDetails(movieId);
+        }
     }
 
     @Override
@@ -109,10 +110,15 @@ public class MovieFragment extends Fragment {
     @Subscribe
     public void updateMovieFragment(MovieSelectionEvent event) {
         if (MoviesApplication.getApp().isLargeLayout()) {
-            MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(event.getMovieId()).enqueue(movieDetailCallback);
-            MoviesApplication.getApp().getApiManager().getEndpoints().getMovieVideos(event.getMovieId()).enqueue(movieVideoCallback);
-            MoviesApplication.getApp().getApiManager().getEndpoints().getMovieReviews(event.getMovieId()).enqueue(movieReviewCallback);
+            movieId = event.getMovieId();
+            fetchMovieDetails(movieId);
         }
+    }
+
+    private void fetchMovieDetails(int movieId) {
+        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(movieId).enqueue(movieDetailCallback);
+        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieVideos(movieId).enqueue(movieVideoCallback);
+        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieReviews(movieId).enqueue(movieReviewCallback);
     }
 
     private Callback<MovieDetail> movieDetailCallback = new Callback<MovieDetail>() {
