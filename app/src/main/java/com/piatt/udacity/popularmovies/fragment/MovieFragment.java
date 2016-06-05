@@ -1,12 +1,14 @@
 package com.piatt.udacity.popularmovies.fragment;
 
 import android.app.Fragment;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Slide;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,6 +72,9 @@ public class MovieFragment extends Fragment {
         Bundle arguments = new Bundle();
         arguments.putInt(MOVIE_ID_KEY, movieId);
         fragment.setArguments(arguments);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            fragment.setEnterTransition(new Slide());
+        }
         return fragment;
     }
 
@@ -92,6 +97,9 @@ public class MovieFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.movie_fragment, container, false);
         unbinder = ButterKnife.bind(this, view);
+        if (!MoviesApplication.getApp().isLargeLayout()) {
+            backButton.setVisibility(View.VISIBLE);
+        }
         return view;
     }
 
@@ -113,7 +121,6 @@ public class MovieFragment extends Fragment {
                 runtimeView.setText(movieDetail.getRuntime());
                 overviewView.setText(movieDetail.getOverview());
                 favoriteButton.setText(MoviesApplication.getApp().getFavoritesManager().isFavoriteMovie(movieId) ? favoriteOnIcon : favoriteOffIcon);
-                configureToolbar();
             }
         }
 
@@ -129,6 +136,7 @@ public class MovieFragment extends Fragment {
                 videoList.setLayoutManager(new LinearLayoutManager(videoList.getContext()));
                 videoList.setAdapter(new MovieVideosAdapter(response.body().getResults()));
                 videosLayout.setVisibility(View.VISIBLE);
+                shareButton.setVisibility(View.VISIBLE);
             }
         }
 
@@ -150,31 +158,6 @@ public class MovieFragment extends Fragment {
         @Override
         public void onFailure(Call<ApiResponse<MovieReview>> call, Throwable t) {}
     };
-
-    private void configureToolbar() {
-        appBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
-            int visibilityOffset = appBarLayout.getTotalScrollRange() - toolbar.getHeight();
-            if (Math.abs(verticalOffset) >= visibilityOffset) {
-                float alpha = (1f / toolbar.getHeight()) * (Math.abs(verticalOffset) - visibilityOffset);
-                if (!MoviesApplication.getApp().isLargeLayout()) {
-                    backButton.setVisibility(View.VISIBLE);
-                    backButton.setAlpha(alpha);
-                }
-                titleView.setVisibility(View.VISIBLE);
-                titleView.setAlpha(alpha);
-                if (videosLayout.isShown()) {
-                    shareButton.setVisibility(View.VISIBLE);
-                    shareButton.setAlpha(alpha);
-                }
-            } else {
-                if (!MoviesApplication.getApp().isLargeLayout()) {
-                    backButton.setVisibility(View.INVISIBLE);
-                }
-                titleView.setVisibility(View.INVISIBLE);
-                shareButton.setVisibility(View.INVISIBLE);
-            }
-        });
-    }
 
     @OnClick(R.id.back_button)
     public void onBackButtonClick() {

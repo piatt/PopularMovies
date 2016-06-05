@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -35,7 +36,7 @@
                     android:textSize="@dimen/size_20"
                     android:textColor="@color/white"
                     android:text="@string/app_name"
-                    style="@style/Text.Medium"/>
+                    style="@style/BoldText"/>
 
                 <Spinner
                     android:id="@+id/filter_spinner"

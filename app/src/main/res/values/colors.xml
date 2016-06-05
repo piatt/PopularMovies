@@ -1,5 +1,6 @@
 <resources>
     <color name="blue">#0277BD</color>
     <color name="dark_blue">#01579B</color>
+    <color name="translucent_blue">#500277BD</color>
     <color name="white">#FFFFFF</color>
 </resources>
