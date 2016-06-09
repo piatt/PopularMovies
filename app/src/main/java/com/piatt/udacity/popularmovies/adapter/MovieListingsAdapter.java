@@ -9,19 +9,15 @@ import android.widget.ImageView;
 import com.annimon.stream.Stream;
 import com.piatt.udacity.popularmovies.MoviesApplication;
 import com.piatt.udacity.popularmovies.R;
-import com.piatt.udacity.popularmovies.event.EventBusUnregisterEvent;
 import com.piatt.udacity.popularmovies.event.MovieSelectEvent;
-import com.piatt.udacity.popularmovies.event.MovieFilterEvent;
 import com.piatt.udacity.popularmovies.model.ApiResponse;
 import com.piatt.udacity.popularmovies.model.MovieDetail;
-import com.piatt.udacity.popularmovies.model.MovieFilter;
 import com.piatt.udacity.popularmovies.model.MovieListing;
 import com.piatt.udacity.popularmovies.model.MovieReview;
 import com.piatt.udacity.popularmovies.model.MovieVideo;
 import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,75 +33,46 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
     private int selectedPosition;
     private List<MovieListing> movieListings = new ArrayList<>();
 
-    public MovieListingsAdapter() {
-        EventBus.getDefault().register(this);
-        EventBus.getDefault().post(new MovieFilterEvent(MovieFilter.POPULAR));
-    }
-
-    @Subscribe
-    public void unregisterEventBus(EventBusUnregisterEvent event) {
-        EventBus.getDefault().unregister(this);
-    }
-
-    /**
-     * This event handler is triggered by a change to the movie list sort spinner
-     * and fetches the appropriate data for the sort type.
-     */
-    @Subscribe
-    public void onMovieFilter(MovieFilterEvent event) {
-        switch (event.getMovieFilter()) {
-            case POPULAR: MoviesApplication.getApp().getApiManager().getEndpoints().getPopularMovies().enqueue(movieListingCallback);
-                break;
-            case TOP_RATED: MoviesApplication.getApp().getApiManager().getEndpoints().getTopRatedMovies().enqueue(movieListingCallback);
-                break;
-            case FAVORITES: getFavoriteMovies();
-                break;
+    public void addMovieListing(MovieListing listing) {
+        movieListings.add(listing);
+        notifyItemInserted(movieListings.size() - 1);
+        fetchMovieDetails();
+        if (MoviesApplication.getApp().isLargeLayout() && movieListings.size() == 1) {
+            selectMovie(0);
         }
     }
 
-    private Callback<MovieDetail> movieCallback = new Callback<MovieDetail>() {
-        @Override
-        public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
-            if (response.isSuccessful()) {
-                movieListings.add(response.body());
-                notifyItemInserted(movieListings.size() - 1);
-                if (MoviesApplication.getApp().isLargeLayout() && movieListings.size() == 1) {
-                    selectMovie(0);
-                }
-            }
+    public void setMovieListings(List<MovieListing> listings) {
+        movieListings.clear();
+        movieListings = listings;
+        notifyDataSetChanged();
+        if (MoviesApplication.getApp().isLargeLayout()) {
+            selectMovie(0);
         }
+    }
 
-        @Override
-        public void onFailure(Call<MovieDetail> call, Throwable t) {}
-    };
+    public void clearMovieListings() {
+        movieListings.clear();
+        notifyDataSetChanged();
+    }
 
-    /**
-     * Upon receipt of data, either from the network or cache,
-     * this callback method populates the MovieListingsAdapter with data.
-     * Additionally, prefetching of MovieDetailItems for each MovieListing object is done in the background
-     * to support performance and offline access.
-     */
-    private Callback<ApiResponse<MovieListing>> movieListingCallback = new Callback<ApiResponse<MovieListing>>() {
-        @Override
-        public void onResponse(Call<ApiResponse<MovieListing>> call, Response<ApiResponse<MovieListing>> response) {
-            if (response.isSuccessful()) {
-                movieListings.clear();
-                movieListings = response.body().getResults();
-                fetchMovieDetails();
-                notifyDataSetChanged();
-                if (MoviesApplication.getApp().isLargeLayout()) {
-                    selectMovie(0);
-                }
-            } else {
-                MoviesApplication.getApp().showErrorMessage(response.message());
-            }
+    private void fetchMovieDetails() {
+        Stream.of(movieListings).forEach(movieListing -> {
+            Picasso.with(MoviesApplication.getApp()).load(movieListing.getPosterUrl()).fetch();
+            MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(movieListing.getId()).enqueue(movieDetailCallback);
+            MoviesApplication.getApp().getApiManager().getEndpoints().getMovieVideos(movieListing.getId()).enqueue(movieVideoCallback);
+            MoviesApplication.getApp().getApiManager().getEndpoints().getMovieReviews(movieListing.getId()).enqueue(movieReviewCallback);
+        });
+    }
+
+    private void selectMovie(int position) {
+        EventBus.getDefault().post(new MovieSelectEvent(movieListings.get(position).getId()));
+        if (MoviesApplication.getApp().isLargeLayout()) {
+            notifyItemChanged(selectedPosition);
+            selectedPosition = position;
+            notifyItemChanged(selectedPosition);
         }
-
-        @Override
-        public void onFailure(Call<ApiResponse<MovieListing>> call, Throwable t) {
-            MoviesApplication.getApp().showErrorMessage(t.getMessage());
-        }
-    };
+    }
 
     /**
      * No action is taken in this callback,
@@ -135,31 +102,6 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
         public void onFailure(Call<ApiResponse<MovieReview>> call, Throwable t) {}
     };
 
-    private void getFavoriteMovies() {
-        List<Integer> favoriteMovies = MoviesApplication.getApp().getFavoritesManager().getFavoriteMovies();
-        movieListings.clear();
-        notifyDataSetChanged();
-        Stream.of(favoriteMovies).forEach(movieId -> MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(movieId).enqueue(movieCallback));
-    }
-
-    private void fetchMovieDetails() {
-        Stream.of(movieListings).forEach(movieListing -> {
-            Picasso.with(MoviesApplication.getApp()).load(movieListing.getPosterUrl()).fetch();
-            MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(movieListing.getId()).enqueue(movieDetailCallback);
-            MoviesApplication.getApp().getApiManager().getEndpoints().getMovieVideos(movieListing.getId()).enqueue(movieVideoCallback);
-            MoviesApplication.getApp().getApiManager().getEndpoints().getMovieReviews(movieListing.getId()).enqueue(movieReviewCallback);
-        });
-    }
-
-    private void selectMovie(int position) {
-        EventBus.getDefault().post(new MovieSelectEvent(movieListings.get(position).getId()));
-        if (MoviesApplication.getApp().isLargeLayout()) {
-            notifyItemChanged(selectedPosition);
-            selectedPosition = position;
-            notifyItemChanged(selectedPosition);
-        }
-    }
-
     @Override
     public int getItemCount() {
         return movieListings.size();
@@ -173,8 +115,10 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
 
     @Override
     public void onBindViewHolder(MovieListingViewHolder holder, int position) {
-        Picasso.with(holder.itemView.getContext()).load(movieListings.get(position).getPosterUrl()).into(holder.posterView);
-        holder.indicatorView.setVisibility(position == selectedPosition ? View.VISIBLE : View.INVISIBLE);
+        Picasso.with(holder.itemView.getContext()).load(movieListings.get(position).getPosterUrl()).placeholder(R.color.blue).into(holder.posterView);
+        if (MoviesApplication.getApp().isLargeLayout()) {
+            holder.indicatorView.setVisibility(position == selectedPosition ? View.VISIBLE : View.INVISIBLE);
+        }
     }
 
     public class MovieListingViewHolder extends RecyclerView.ViewHolder {

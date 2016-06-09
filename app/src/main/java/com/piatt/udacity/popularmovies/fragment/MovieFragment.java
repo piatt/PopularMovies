@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,8 +73,8 @@ public class MovieFragment extends Fragment {
         Bundle arguments = new Bundle();
         arguments.putInt(MOVIE_ID_KEY, movieId);
         fragment.setArguments(arguments);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            fragment.setEnterTransition(new Slide());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !MoviesApplication.getApp().isLargeLayout()) {
+            fragment.setEnterTransition(new Slide(Gravity.RIGHT));
         }
         return fragment;
     }
@@ -82,9 +83,6 @@ public class MovieFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         movieId = getArguments().getInt(MOVIE_ID_KEY);
-        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(movieId).enqueue(movieDetailCallback);
-        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieVideos(movieId).enqueue(movieVideoCallback);
-        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieReviews(movieId).enqueue(movieReviewCallback);
     }
 
     /**
@@ -97,10 +95,17 @@ public class MovieFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.movie_fragment, container, false);
         unbinder = ButterKnife.bind(this, view);
+        configureView();
+        return view;
+    }
+
+    private void configureView() {
         if (!MoviesApplication.getApp().isLargeLayout()) {
             backButton.setVisibility(View.VISIBLE);
         }
-        return view;
+        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(movieId).enqueue(movieDetailCallback);
+        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieVideos(movieId).enqueue(movieVideoCallback);
+        MoviesApplication.getApp().getApiManager().getEndpoints().getMovieReviews(movieId).enqueue(movieReviewCallback);
     }
 
     @Override
