@@ -52,16 +52,8 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <android.support.v4.widget.ContentLoadingProgressBar
-            android:id="@+id/loading_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:indeterminate="true"
-            app:backgroundTint="@color/white"
-            style="?android:attr/progressBarStyle"/>
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:id="@+id/message_layout"
@@ -95,8 +87,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="@dimen/space_2"
-            android:visibility="invisible"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+            android:visibility="invisible"/>
+
+        <ProgressBar
+            android:id="@+id/loading_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            style="?android:attr/progressBarStyle"/>
 
     </FrameLayout>
 </android.support.design.widget.CoordinatorLayout>

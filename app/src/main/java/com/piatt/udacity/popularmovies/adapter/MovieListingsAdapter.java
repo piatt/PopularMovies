@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.piatt.udacity.popularmovies.MoviesApplication;
 import com.piatt.udacity.popularmovies.R;
@@ -39,6 +40,15 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
         fetchMovieDetails();
         if (MoviesApplication.getApp().isLargeLayout() && movieListings.size() == 1) {
             selectMovie(0);
+        }
+    }
+
+    public void removeMovieListing(int movieId) {
+        Optional<MovieListing> movieListing = Stream.of(movieListings).filter(listing -> listing.getId() == movieId).findFirst();
+        if (movieListing.isPresent()) {
+            int position = movieListings.indexOf(movieListing.get());
+            movieListings.remove(movieListing.get());
+            notifyItemRemoved(position);
         }
     }
 

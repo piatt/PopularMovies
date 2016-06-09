@@ -180,14 +180,15 @@ public class MovieFragment extends Fragment {
         if (MoviesApplication.getApp().getFavoritesManager().isFavoriteMovie(movieId)) {
             favoriteButton.setText(favoriteOffIcon);
             MoviesApplication.getApp().getFavoritesManager().removeFavoriteMovie(movieId);
+            EventBus.getDefault().post(new FavoritesUpdateEvent(movieId, false));
             snackbarMessage = String.format(removeFavoriteMessage, titleView.getText().toString());
         } else {
             favoriteButton.setText(favoriteOnIcon);
             MoviesApplication.getApp().getFavoritesManager().addFavoriteMovie(movieId);
+            EventBus.getDefault().post(new FavoritesUpdateEvent(movieId, true));
             snackbarMessage = String.format(addFavoriteMessage, titleView.getText().toString());
         }
         Snackbar.make(favoriteButton, snackbarMessage, Snackbar.LENGTH_SHORT).show();
-        EventBus.getDefault().post(new FavoritesUpdateEvent());
     }
 
     @OnClick(R.id.videos_toggle_button)

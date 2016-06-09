@@ -13,11 +13,20 @@ import java.util.Set;
 
 public class FavoritesManager {
     private final String PREFERENCES_KEY = "MOVIES_PREFERENCES";
+    private final String FILTER_KEY = "FILTER";
     private final String FAVORITES_KEY = "FAVORITES";
     private SharedPreferences sharedPreferences;
 
     public FavoritesManager() {
         sharedPreferences = MoviesApplication.getApp().getSharedPreferences(PREFERENCES_KEY, Context.MODE_PRIVATE);
+    }
+
+    public int getMoviesFilter() {
+        return sharedPreferences.getInt(FILTER_KEY, 0);
+    }
+
+    public void setMoviesFilter(int filter) {
+        sharedPreferences.edit().putInt(FILTER_KEY, filter).commit();
     }
 
     public List<Integer> getFavoriteMovies() {

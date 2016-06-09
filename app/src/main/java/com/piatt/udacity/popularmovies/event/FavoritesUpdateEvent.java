@@ -1,3 +1,14 @@
 package com.piatt.udacity.popularmovies.event;
 
-public class FavoritesUpdateEvent {}
+import lombok.Getter;
+import lombok.Setter;
+
+public class FavoritesUpdateEvent {
+    @Getter @Setter private int movieId;
+    @Getter @Setter private boolean favorite;
+
+    public FavoritesUpdateEvent(int movieId, boolean favorite) {
+        setMovieId(movieId);
+        setFavorite(favorite);
+    }
+}
