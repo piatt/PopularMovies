@@ -87,12 +87,6 @@ public class MovieFragment extends Fragment {
         movieId = getArguments().getInt(MOVIE_ID_KEY);
     }
 
-    /**
-     * Called on fragment creation or rotation, this method smartly updates the existing bound views, if available.
-     * Additionally, although it appears to make a network call each time the method is invoked via the updateMovieDetailView method,
-     * the ContextManager handles response caching, delivering the data to the movieDetailsCallback instantly from cache, if available, even offline.
-     * This eliminates the need for the fragment itself to handle instance state.
-     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.movie_fragment, container, false);
@@ -101,10 +95,18 @@ public class MovieFragment extends Fragment {
         return view;
     }
 
+    /**
+     * The back arrow icon in the toolbar of a movie detail screen acts as a back button,
+     * but is only visible on phones, not on tablets.
+     * The heart icon denoting favorite status for a movie is set via the saved shared preference,
+     * if it exists for the particular movie. Otherwise, it is set as unfavorited.
+     * When a movie detail screen is shown, API calls are made to fetch details, trailers, and reviews, if available.
+     */
     private void configureView() {
         if (!MoviesApplication.getApp().isLargeLayout()) {
             backButton.setVisibility(View.VISIBLE);
         }
+        favoriteButton.setText(MoviesApplication.getApp().getFavoritesManager().isFavoriteMovie(movieId) ? favoriteOnIcon : favoriteOffIcon);
         MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(movieId).enqueue(movieDetailCallback);
         MoviesApplication.getApp().getApiManager().getEndpoints().getMovieVideos(movieId).enqueue(movieVideoCallback);
         MoviesApplication.getApp().getApiManager().getEndpoints().getMovieReviews(movieId).enqueue(movieReviewCallback);
@@ -116,6 +118,12 @@ public class MovieFragment extends Fragment {
         unbinder.unbind();
     }
 
+    /**
+     * This callback is invoked when the details for a particular movie are fetched.
+     * If the API call is successful, the data is bound to the appropriate views.
+     * If the API call fails, the user is shown the appropriate error dialog.
+     * Additionally, on failure on phones, the user is navigated back to the movie listings screen.
+     */
     private Callback<MovieDetail> movieDetailCallback = new Callback<MovieDetail>() {
         @Override
         public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
@@ -127,7 +135,6 @@ public class MovieFragment extends Fragment {
                 ratingView.setText(movieDetail.getRating());
                 runtimeView.setText(movieDetail.getRuntime());
                 overviewView.setText(movieDetail.getOverview());
-                favoriteButton.setText(MoviesApplication.getApp().getFavoritesManager().isFavoriteMovie(movieId) ? favoriteOnIcon : favoriteOffIcon);
             }
         }
 
@@ -141,6 +148,12 @@ public class MovieFragment extends Fragment {
         }
     };
 
+    /**
+     * This callback is invoked when the full set of movie trailers for a particular movie are fetched.
+     * If the response is not empty, the appropriate adapter is updated with the results,
+     * and the trailers section header is made visible to the user for toggling.
+     * If the response is empty, the trailers section is not made visible to the user.
+     */
     private Callback<ApiResponse<MovieVideo>> movieVideoCallback = new Callback<ApiResponse<MovieVideo>>() {
         @Override
         public void onResponse(Call<ApiResponse<MovieVideo>> call, Response<ApiResponse<MovieVideo>> response) {
@@ -157,6 +170,12 @@ public class MovieFragment extends Fragment {
         public void onFailure(Call<ApiResponse<MovieVideo>> call, Throwable t) {}
     };
 
+    /**
+     * This callback is invoked when the full set of movie reviews for a particular movie are fetched.
+     * If the response is not empty, the appropriate adapter is updated with the results,
+     * and the reviews section header is made visible to the user for toggling.
+     * If the response is empty, the reviews section is not made visible to the user.
+     */
     private Callback<ApiResponse<MovieReview>> movieReviewCallback = new Callback<ApiResponse<MovieReview>>() {
         @Override
         public void onResponse(Call<ApiResponse<MovieReview>> call, Response<ApiResponse<MovieReview>> response) {
@@ -177,11 +196,24 @@ public class MovieFragment extends Fragment {
         getActivity().onBackPressed();
     }
 
+    /**
+     * This click handler is invoked when a user taps the share icon in the toolbar of a movie detail screen.
+     * This button is only visible if the movie has at least one trailer available for viewing.
+     * When the user taps this button, an event is fired to handle the share intent.
+     */
     @OnClick(R.id.share_button)
     public void onShareButtonClick() {
         EventBus.getDefault().post(new MovieVideoShareEvent());
     }
 
+    /**
+     * This click handler is invoked when a user taps on the heart icon on a movie detail screen.
+     * If the heart is not filled in, when the user taps on it, the heart is filled in,
+     * and the movie is added to the saved list of favorites. Likewise, if the heart is filled in,
+     * when the user taps on it, the heart becomes unfilled, and the movie is removed from favorites.
+     * Additionally, a snackbar message notifies the user of their action, and an event is fired
+     * to handle updating of the favorites on the movie listings screen, if applicable.
+     */
     @OnClick(R.id.favorite_button)
     public void onFavoriteButtonClick() {
         String snackbarMessage;

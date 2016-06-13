@@ -10,6 +10,10 @@ import com.piatt.udacity.popularmovies.manager.FavoritesManager;
 
 import lombok.Getter;
 
+/**
+ * This class acts as a singleton for context access throughout the app where necessary
+ * and also provides access to manager instances and convenience methods where needed.
+ */
 public class MoviesApplication extends Application {
     private ConnectivityManager connectivityManager;
     @Getter private ApiManager apiManager;

@@ -12,8 +12,7 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-        // TODO: Remove before pushing code to repo
-        buildConfigField "String", "API_KEY", "\"f0d27daafdedd38c2396470e6656e862\""
+        buildConfigField "String", "API_KEY", ""
     }
     buildTypes {
         release {

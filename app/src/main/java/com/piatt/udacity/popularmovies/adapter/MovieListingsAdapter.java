@@ -35,15 +35,23 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
     private int selectedPosition;
     @Getter private List<MovieListing> movieListings = new ArrayList<>();
 
+    /**
+     * This method is called when a favorite is added to the movie listings screen.
+     * If this is the first listing to be added and the device in use is a tablet,
+     * the listing is selected in order to trigger an update to the detail screen.
+     */
     public void addMovieListing(MovieListing listing) {
         movieListings.add(listing);
         notifyItemInserted(movieListings.size() - 1);
-        fetchMovieDetails();
         if (MoviesApplication.getApp().isLargeLayout() && movieListings.size() == 1) {
             selectMovie(0);
         }
     }
 
+    /**
+     * This method is called when a favorite is removed from the movie listings screen.
+     * The listing in question is only removed if it currently exists in the list.
+     */
     public void removeMovieListing(int movieId) {
         Optional<MovieListing> movieListing = Stream.of(movieListings).filter(listing -> listing.getId() == movieId).findFirst();
         if (movieListing.isPresent()) {
@@ -53,20 +61,38 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
         }
     }
 
+    /**
+     * This method is called when a movie filter other than favorites is selected,
+     * either by the user or on app launch. If the device in use is a tablet,
+     * If this is the first listing to be added and the device in use is a tablet,
+     * the first listing is selected in order to trigger an update to the detail screen.
+     */
     public void setMovieListings(List<MovieListing> listings) {
         movieListings.clear();
         movieListings = listings;
         notifyDataSetChanged();
+        fetchMovieDetails();
         if (MoviesApplication.getApp().isLargeLayout()) {
             selectMovie(0);
         }
     }
 
+    /**
+     * This method is called prior to the individual fetching of favorite listings,
+     * since those listings will be added one at a time.
+     */
     public void clearMovieListings() {
         movieListings.clear();
         notifyDataSetChanged();
     }
 
+    /**
+     * When a new batch of movie listings is set, API calls are made to pre-fetch
+     * poster images, details, trailers, and reviews, if available.
+     * Although these items are needed on the movie listings screen,
+     * anything that is pre-fetched will be cached for instant access
+     * when the user selects a movie from the list at any point thereafter.
+     */
     private void fetchMovieDetails() {
         Stream.of(movieListings).forEach(movieListing -> {
             Picasso.with(MoviesApplication.getApp()).load(movieListing.getPosterUrl()).fetch();
@@ -76,6 +102,12 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
         });
     }
 
+    /**
+     * When a movie is selected from the movie listings screen, an event is fired
+     * to handle updating the movie details screen accordingly.
+     * If the device in use is a tablet, the selected position is tracked and updated to show
+     * the currently selected movie to the user.
+     */
     private void selectMovie(int position) {
         EventBus.getDefault().post(new MovieSelectEvent(movieListings.get(position).getId()));
         if (MoviesApplication.getApp().isLargeLayout()) {
@@ -86,8 +118,9 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
     }
 
     /**
-     * No action is taken in this callback,
-     * since the same calls will be made later by movie detail views when the data needs to be displayed.
+     * The following three callbacks are invoked when their respective API call returns.
+     * Since the data is only being pre-fetched for caching here, nothing is done with the response.
+     * If the same API call has already been pre-fetched and cached, the cached version is served up immediately.
      */
     private Callback<MovieDetail> movieDetailCallback = new Callback<MovieDetail>() {
         @Override
@@ -124,6 +157,10 @@ public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdap
         return new MovieListingViewHolder(view);
     }
 
+    /**
+     * This method binds the poster image for each movie listing to it's grid cell.
+     * If the device in use is a tablet, the selection indicator is shown if the position matches the tracked position.
+     */
     @Override
     public void onBindViewHolder(MovieListingViewHolder holder, int position) {
         Picasso.with(holder.itemView.getContext()).load(movieListings.get(position).getPosterUrl()).placeholder(R.color.blue).into(holder.posterView);

@@ -65,11 +65,14 @@ public class ApiManager {
         return apiInterface;
     }
 
+    /**
+     * This interface holds all of the API endpoints used in the app.
+     * Invokers of these methods use a callback to handle the response asynchronously.
+     */
     public interface ApiInterface {
         String API_PARAM_ID = "id";
         String API_ENDPOINT_POPULAR = "popular";
         String API_ENDPOINT_TOP_RATED = "top_rated";
-        String API_ENDPOINT_FAVORITES = "favorites";
         String API_ENDPOINT_DETAILS = "{" + API_PARAM_ID + "}";
         String API_ENDPOINT_VIDEOS = API_ENDPOINT_DETAILS + "/videos";
         String API_ENDPOINT_REVIEWS = API_ENDPOINT_DETAILS + "/reviews";
@@ -79,9 +82,6 @@ public class ApiManager {
 
         @GET(API_ENDPOINT_TOP_RATED)
         Call<ApiResponse<MovieListing>> getTopRatedMovies();
-
-        @GET(API_ENDPOINT_FAVORITES)
-        Call<ApiResponse<MovieListing>> getFavoriteMovies();
 
         @GET(API_ENDPOINT_DETAILS)
         Call<MovieDetail> getMovieDetails(@Path(API_PARAM_ID) int id);

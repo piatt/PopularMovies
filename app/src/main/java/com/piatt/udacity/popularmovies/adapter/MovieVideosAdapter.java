@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.piatt.udacity.popularmovies.MoviesApplication;
 import com.piatt.udacity.popularmovies.R;
 import com.piatt.udacity.popularmovies.adapter.MovieVideosAdapter.MovieVideoViewHolder;
-import com.piatt.udacity.popularmovies.event.EventBusUnregisterEvent;
 import com.piatt.udacity.popularmovies.event.MovieVideoShareEvent;
 import com.piatt.udacity.popularmovies.model.MovieVideo;
 
@@ -31,14 +30,23 @@ public class MovieVideosAdapter extends RecyclerView.Adapter<MovieVideoViewHolde
 
     public MovieVideosAdapter(List<MovieVideo> movieVideos) {
         setMovieVideos(movieVideos);
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         EventBus.getDefault().register(this);
     }
 
-    @Subscribe
-    public void unregisterEventBus(EventBusUnregisterEvent event) {
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         EventBus.getDefault().unregister(this);
     }
 
+    /**
+     * This event handler is invoked when the share button in the toolbar of a movie detail screen
+     * is tapped by a user. Using the first trailer's YouTube URL, a new sharing intent is created,
+     * giving the user a dialog from which to choose the app they would like to share the URL with.
+     */
     @Subscribe
     public void onMovieVideoShare(MovieVideoShareEvent event) {
         if (!movieVideos.isEmpty()) {
@@ -76,6 +84,11 @@ public class MovieVideosAdapter extends RecyclerView.Adapter<MovieVideoViewHolde
             ButterKnife.bind(this, itemView);
         }
 
+        /**
+         * This click handler is invoked when a user taps on any row in the list of trailers
+         * on a movie detail screen. Using the trailer's YouTube URL, a new viewing intent is created,
+         * which will then launch trailer in the YouTube app, if installed, or else in the browser.
+         */
         @OnClick(R.id.play_button)
         public void onPlayButtonClick() {
             Intent playIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(movieVideos.get(getAdapterPosition()).getVideoUrl()));

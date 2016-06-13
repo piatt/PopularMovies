@@ -70,6 +70,11 @@ public class MoviesFragment extends Fragment {
         return coordinatorLayout;
     }
 
+    /**
+     * Movies are displayed in a two column grid on phones, and in a 4 column grid on tablets.
+     * The movie filter dropdown spinner is initialized with the last selected filter.
+     * If no saved filter is available, the first option is selected.
+     */
     private void configureView() {
         loadingView.getIndeterminateDrawable().setColorFilter(whiteColor, PorterDuff.Mode.SRC_IN);
         movieListingsAdapter = new MovieListingsAdapter();
@@ -80,6 +85,11 @@ public class MoviesFragment extends Fragment {
         filterSpinner.setSelection(MoviesApplication.getApp().getFavoritesManager().getMoviesFilter());
     }
 
+    /**
+     * Unlike the other two filter options which query an API endpoint,
+     * the favorites are fetched individually from the list of saved movie ids.
+     * If no saved favorites are available, the user is shown a dialog explaining how to add favorites.
+     */
     private void getFavoriteMovies() {
         loadingView.setVisibility(View.GONE);
         List<Integer> favoriteMovies = MoviesApplication.getApp().getFavoritesManager().getFavoriteMovies();
@@ -97,6 +107,11 @@ public class MoviesFragment extends Fragment {
         EventBus.getDefault().post(new MovieMessageEvent(messageType));
     }
 
+    /**
+     * This callback is used for individual favorites only.
+     * Each successful callback for a particular movie results in it being added to the existing listings.
+     * If the API call fails, the user is shown the appropriate error dialog.
+     */
     private Callback<MovieDetail> movieDetailCallback = new Callback<MovieDetail>() {
         @Override
         public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
@@ -112,10 +127,9 @@ public class MoviesFragment extends Fragment {
     };
 
     /**
-     * Upon receipt of data, either from the network or cache,
-     * this callback method populates the MovieListingsAdapter with data.
-     * Additionally, prefetching of MovieDetailItems for each MovieListing object is done in the background
-     * to support performance and offline access.
+     * This callback is invoked when the full set of movie listings for a particular filter are fetched.
+     * If the response is empty or the API call fails, the user is shown the appropriate error dialog.
+     * Otherwise, the adapter is updated with the results.
      */
     private Callback<ApiResponse<MovieListing>> movieListingCallback = new Callback<ApiResponse<MovieListing>>() {
         @Override
@@ -136,6 +150,11 @@ public class MoviesFragment extends Fragment {
         }
     };
 
+    /**
+     * This listener is invoked when a movie listings filter is selected from the dropdown spinner,
+     * either by the user or from the last saved filter value on app launch.
+     * The new selection is saved to shared preferences and the proper API calls are made.
+     */
     private OnItemSelectedListener filterSpinnerSelectionListener = new OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -157,6 +176,11 @@ public class MoviesFragment extends Fragment {
         public void onNothingSelected(AdapterView<?> parent) {}
     };
 
+    /**
+     * This event handler is invoked when an individual movie is favorited or unfavorited from a detail screen.
+     * If the current movie listings filter is favorites, the listings are updated accordingly to show immediate updates.
+     * If removal of a favorite results in no favorites remaining, the user is shown a dialog explaining how to add favorites.
+     */
     @Subscribe
     public void onFavoritesUpdate(FavoritesUpdateEvent event) {
         if (filterSpinner.getSelectedItemPosition() == FAVORITES) {
