@@ -11,17 +11,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.annimon.stream.Stream;
 import com.piatt.udacity.popularmovies.MoviesApplication;
 import com.piatt.udacity.popularmovies.R;
 import com.piatt.udacity.popularmovies.adapter.MovieListingsAdapter;
 import com.piatt.udacity.popularmovies.event.FavoritesUpdateEvent;
+import com.piatt.udacity.popularmovies.event.MovieMessageEvent;
 import com.piatt.udacity.popularmovies.model.ApiResponse;
+import com.piatt.udacity.popularmovies.model.MessageType;
 import com.piatt.udacity.popularmovies.model.MovieDetail;
 import com.piatt.udacity.popularmovies.model.MovieListing;
 
@@ -45,9 +45,6 @@ public class MoviesFragment extends Fragment {
     @BindView(R.id.coordinator_layout) CoordinatorLayout coordinatorLayout;
     @BindView(R.id.filter_spinner) Spinner filterSpinner;
     @BindView(R.id.loading_view) ProgressBar loadingView;
-    @BindView(R.id.message_layout) LinearLayout messageLayout;
-    @BindView(R.id.icon_view) TextView iconView;
-    @BindView(R.id.message_view) TextView messageView;
     @BindView(R.id.movie_list) RecyclerView movieList;
     @Getter @Setter private MovieListingsAdapter movieListingsAdapter;
 
@@ -84,11 +81,20 @@ public class MoviesFragment extends Fragment {
     }
 
     private void getFavoriteMovies() {
-        List<Integer> favoriteMovies = MoviesApplication.getApp().getFavoritesManager().getFavoriteMovies();
-        movieListingsAdapter.clearMovieListings();
         loadingView.setVisibility(View.GONE);
-        movieList.setVisibility(View.VISIBLE);
-        Stream.of(favoriteMovies).forEach(movieId -> MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(movieId).enqueue(movieDetailCallback));
+        List<Integer> favoriteMovies = MoviesApplication.getApp().getFavoritesManager().getFavoriteMovies();
+        if (favoriteMovies.isEmpty()) {
+            EventBus.getDefault().post(new MovieMessageEvent(MessageType.FAVORITES));
+        } else {
+            movieListingsAdapter.clearMovieListings();
+            movieList.setVisibility(View.VISIBLE);
+            Stream.of(favoriteMovies).forEach(movieId -> MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(movieId).enqueue(movieDetailCallback));
+        }
+    }
+
+    private void showErrorMessage() {
+        MessageType messageType = MoviesApplication.getApp().isNetworkAvailable() ? MessageType.API : MessageType.CONNECTION;
+        EventBus.getDefault().post(new MovieMessageEvent(messageType));
     }
 
     private Callback<MovieDetail> movieDetailCallback = new Callback<MovieDetail>() {
@@ -100,7 +106,9 @@ public class MoviesFragment extends Fragment {
         }
 
         @Override
-        public void onFailure(Call<MovieDetail> call, Throwable t) {}
+        public void onFailure(Call<MovieDetail> call, Throwable t) {
+            showErrorMessage();
+        }
     };
 
     /**
@@ -117,13 +125,14 @@ public class MoviesFragment extends Fragment {
                 movieListingsAdapter.setMovieListings(response.body().getResults());
                 movieList.setVisibility(View.VISIBLE);
             } else {
-                MoviesApplication.getApp().showErrorMessage(response.message());
+                showErrorMessage();
             }
         }
 
         @Override
         public void onFailure(Call<ApiResponse<MovieListing>> call, Throwable t) {
-            MoviesApplication.getApp().showErrorMessage(t.getMessage());
+            loadingView.setVisibility(View.GONE);
+            showErrorMessage();
         }
     };
 
@@ -155,6 +164,9 @@ public class MoviesFragment extends Fragment {
                 MoviesApplication.getApp().getApiManager().getEndpoints().getMovieDetails(event.getMovieId()).enqueue(movieDetailCallback);
             } else {
                 movieListingsAdapter.removeMovieListing(event.getMovieId());
+                if (movieListingsAdapter.getMovieListings().isEmpty()) {
+                    EventBus.getDefault().post(new MovieMessageEvent(MessageType.FAVORITES));
+                }
             }
         }
     }

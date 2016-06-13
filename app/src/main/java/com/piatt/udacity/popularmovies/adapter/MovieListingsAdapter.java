@@ -26,13 +26,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import lombok.Getter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MovieListingsAdapter extends RecyclerView.Adapter<MovieListingsAdapter.MovieListingViewHolder> {
     private int selectedPosition;
-    private List<MovieListing> movieListings = new ArrayList<>();
+    @Getter private List<MovieListing> movieListings = new ArrayList<>();
 
     public void addMovieListing(MovieListing listing) {
         movieListings.add(listing);

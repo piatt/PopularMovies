@@ -9,7 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import com.piatt.udacity.popularmovies.MoviesApplication;
 import com.piatt.udacity.popularmovies.R;
 import com.piatt.udacity.popularmovies.event.EventBusUnregisterEvent;
+import com.piatt.udacity.popularmovies.event.MovieMessageEvent;
 import com.piatt.udacity.popularmovies.event.MovieSelectEvent;
+import com.piatt.udacity.popularmovies.fragment.MessageFragment;
 import com.piatt.udacity.popularmovies.fragment.MovieFragment;
 import com.piatt.udacity.popularmovies.fragment.MoviesFragment;
 
@@ -49,5 +51,10 @@ public class MoviesActivity extends AppCompatActivity {
             fragmentTransaction.addToBackStack(null);
         }
         fragmentTransaction.commit();
+    }
+
+    @Subscribe
+    public void onMovieMessage(MovieMessageEvent event) {
+        MessageFragment.newInstance(event.getMessageType()).show(getFragmentManager(), MessageFragment.class.getSimpleName());
     }
 }

@@ -50,52 +50,20 @@
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
-    <FrameLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/movie_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:padding="@dimen/space_2"
+        android:visibility="invisible"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-        <LinearLayout
-            android:id="@+id/message_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
+    <ProgressBar
+        android:id="@+id/loading_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        style="?android:attr/progressBarStyle"/>
 
-            <TextView
-                android:id="@+id/icon_view"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/size_64"
-                android:textColor="@color/white"
-                android:text="@string/connection_icon"
-                style="@style/IconText"/>
-
-            <TextView
-                android:id="@+id/message_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/size_20"
-                android:textColor="@color/white"
-                android:text="Looks like you're not connected to the Internet! Please check your settings and try again."
-                style="@style/BoldText"/>
-
-        </LinearLayout>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/movie_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="@dimen/space_2"
-            android:visibility="invisible"/>
-
-        <ProgressBar
-            android:id="@+id/loading_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:indeterminate="true"
-            style="?android:attr/progressBarStyle"/>
-
-    </FrameLayout>
 </android.support.design.widget.CoordinatorLayout>

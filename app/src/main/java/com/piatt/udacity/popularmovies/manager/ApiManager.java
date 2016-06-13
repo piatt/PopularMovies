@@ -26,7 +26,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 
 public class ApiManager {
-    private final int CACHE_SIZE = 204800; // 20 MB
+    private final int CACHE_SIZE = 409600; // 40 MB
     private final String CACHE_DIR = "popular-movies";
     private final String API_BASE_URL = "http://api.themoviedb.org/3/movie/";
     private final String API_KEY_PARAM = "api_key";

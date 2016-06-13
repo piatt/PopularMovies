@@ -22,8 +22,10 @@ import com.piatt.udacity.popularmovies.R;
 import com.piatt.udacity.popularmovies.adapter.MovieReviewsAdapter;
 import com.piatt.udacity.popularmovies.adapter.MovieVideosAdapter;
 import com.piatt.udacity.popularmovies.event.FavoritesUpdateEvent;
+import com.piatt.udacity.popularmovies.event.MovieMessageEvent;
 import com.piatt.udacity.popularmovies.event.MovieVideoShareEvent;
 import com.piatt.udacity.popularmovies.model.ApiResponse;
+import com.piatt.udacity.popularmovies.model.MessageType;
 import com.piatt.udacity.popularmovies.model.MovieDetail;
 import com.piatt.udacity.popularmovies.model.MovieReview;
 import com.piatt.udacity.popularmovies.model.MovieVideo;
@@ -130,7 +132,13 @@ public class MovieFragment extends Fragment {
         }
 
         @Override
-        public void onFailure(Call<MovieDetail> call, Throwable t) {}
+        public void onFailure(Call<MovieDetail> call, Throwable t) {
+            MessageType messageType = MoviesApplication.getApp().isNetworkAvailable() ? MessageType.API : MessageType.CONNECTION;
+            EventBus.getDefault().post(new MovieMessageEvent(messageType));
+            if (!MoviesApplication.getApp().isLargeLayout()) {
+                onBackButtonClick();
+            }
+        }
     };
 
     private Callback<ApiResponse<MovieVideo>> movieVideoCallback = new Callback<ApiResponse<MovieVideo>>() {
