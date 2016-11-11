@@ -1,5 +1,5 @@
-# Popular Movies
-Udacity Android Nanodegree Project 1
+#Popular Movies
+###Udacity Android Nanodegree Project 1
 
 Please follow the following steps to ensure proper functionality of this app:
 
